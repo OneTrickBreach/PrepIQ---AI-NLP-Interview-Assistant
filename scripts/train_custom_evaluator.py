@@ -384,15 +384,30 @@ if __name__ == "__main__":
     parser.add_argument("--max_length", type=int, default=512, help="Maximum sequence length for tokenizer")
     
     args = parser.parse_args()
-    
+
+    # If no checkpoint specified, check for existing best model
+    default_best_model = os.path.join(args.output_dir, "custom_evaluator_best.pt")
+    if args.load_checkpoint is None and os.path.exists(default_best_model):
+        logger.info(f"No checkpoint specified, but found existing best model: {default_best_model}. Will continue training from it.")
+        args.load_checkpoint = default_best_model
+    elif args.load_checkpoint is None:
+        logger.info("No checkpoint specified and no existing best model found. Training from scratch.")
+
     if not os.path.isdir(args.data_dir):
         logger.error(f"Data directory not found: {args.data_dir}")
         sys.exit(1)
         
     best_model_path = train_evaluator(args)
     
+    # After training, always save the best model as 'custom_evaluator_best.pt'
     if best_model_path:
-         logger.info(f"Successfully completed training. Best model saved at: {best_model_path}")
+        try:
+            import shutil
+            shutil.copyfile(best_model_path, default_best_model)
+            logger.info(f"Copied best model to {default_best_model}")
+        except Exception as e:
+            logger.warning(f"Failed to copy best model to {default_best_model}: {e}")
+        logger.info(f"Successfully completed training. Best model saved at: {best_model_path}")
     else:
-         logger.error("Training failed or did not produce a model.")
-         sys.exit(1)
+        logger.error("Training failed or did not produce a model.")
+        sys.exit(1)

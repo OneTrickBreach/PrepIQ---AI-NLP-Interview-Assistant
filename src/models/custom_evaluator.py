@@ -126,28 +126,17 @@ class CustomEvaluatorModel(BaseModel):
         super().__init__(model_name="sentence-transformers/all-mpnet-base-v2")
         
         determined_path = model_path
-        if determined_path:
-            logger.info(f"Using provided model path: {determined_path}")
-        else:
-            logger.info(f"No specific model path provided. Searching for latest model in '{models_dir}/'")
-            try:
-                # Find all .pt files matching the pattern in the models directory
-                model_files = glob.glob(os.path.join(models_dir, 'custom_evaluator_*.pt'))
-                
-                if not model_files:
-                    logger.warning(f"No trained models found in '{models_dir}/'. Initializing with base weights only.")
-                    determined_path = None
-                else:
-                    # Find the most recently modified file
-                    latest_model_file = max(model_files, key=os.path.getmtime)
-                    logger.info(f"Automatically loading latest model: {latest_model_file}")
-                    determined_path = latest_model_file
-                    
-            except Exception as e:
-                logger.error(f"Error finding latest model in '{models_dir}/': {e}. Initializing with base weights only.")
-                determined_path = None
 
-        self.model_path = determined_path # Set the path to be used by load_model
+        # Always check for 'custom_evaluator_best.pt' first
+        best_model_path = os.path.join(models_dir, "custom_evaluator_best.pt")
+        if not determined_path and os.path.exists(best_model_path):
+            logger.info(f"Found 'custom_evaluator_best.pt'. Loading this model: {best_model_path}")
+            determined_path = best_model_path
+        elif not determined_path:
+            logger.warning(f"No 'custom_evaluator_best.pt' found in '{models_dir}/'. Please train the model first.")
+            determined_path = None
+
+        self.model_path = determined_path
         self.load_model()
         
         # Load role-specific criteria for evaluation (remains the same)
