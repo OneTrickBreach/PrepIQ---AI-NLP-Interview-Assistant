@@ -32,7 +32,7 @@ Thumbs.db
 # Data / Models / Logs / Cache (Potentially large or generated)
 data/
 organized_data/
-models/  # Commented out to allow uploading latest trained model
+models/ 
 results/
 error_log.txt
 .pytest_cache/
