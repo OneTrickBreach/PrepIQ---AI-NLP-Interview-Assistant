@@ -52,3 +52,4 @@ frontend/*.log
 
 # Placeholder files (ignore the placeholders themselves)
 # placeholder.txt  # Allow placeholder files to be tracked
+models/custom_evaluator_best.pt
