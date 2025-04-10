@@ -32,7 +32,7 @@ Thumbs.db
 # Data / Models / Logs / Cache (Potentially large or generated)
 data/
 organized_data/
-models/ 
+models/  # Re-excluded models directory after uploading placeholder
 results/
 error_log.txt
 .pytest_cache/
@@ -51,4 +51,4 @@ frontend/*.log
 .ipynb_checkpoints/
 
 # Placeholder files (ignore the placeholders themselves)
-placeholder.txt
+# placeholder.txt  # Allow placeholder files to be tracked
