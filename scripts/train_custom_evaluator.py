@@ -365,6 +365,19 @@ def train_evaluator(args):
              torch.save(model.state_dict(), current_model_path)
              best_model_path = current_model_path 
              logger.info(f"Saved model after epoch {epoch+1} to {best_model_path}")
+        
+        # --- Periodic Save every 10 epochs ---
+        if (epoch + 1) % 10 == 0:
+            os.makedirs(args.output_dir, exist_ok=True)
+            periodic_save_path = os.path.join(args.output_dir, "custom_evaluator_best.pt")
+            try:
+                torch.save(model.state_dict(), periodic_save_path)
+                logger.info(f"Periodic save after epoch {epoch+1} to {periodic_save_path}")
+                # Update best_model_path if this is the most recent save
+                best_model_path = periodic_save_path
+            except Exception as e:
+                 logger.error(f"Failed periodic save after epoch {epoch+1}: {e}")
+        # ------------------------------------
 
     logger.info(f"Training complete. Final best model saved to {best_model_path}")
     
