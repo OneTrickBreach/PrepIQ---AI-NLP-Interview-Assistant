@@ -1,0 +1,8 @@
+{
+  "id": "a_GoodPlaceholder_0",
+  "question_id": "q_Site_Reliability_Engineer_placeholder_0",
+  "content": "Toil refers to manual, repetitive, automatable, tactical work that lacks enduring value and scales linearly with service growth. Examples include manual releases, ticket handling, or simple monitoring checks. To reduce toil, SREs focus on automation. This involves writing scripts or tools to automate repetitive tasks, improving monitoring to reduce manual checks, implementing infrastructure as code, and building self-service tools for common operations.",
+  "audio_source": null,
+  "confidence": 1.0,
+  "created_at": "2025-04-08T20:37:30Z"
+}

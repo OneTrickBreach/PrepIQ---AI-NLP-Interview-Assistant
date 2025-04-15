@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 from src.schemas import Question, Answer, Feedback
 from src.metrics import InterviewMetrics
+from src.schemas.metrics import EvaluationMetrics # Added this import
 
 class DataGenerator:
     def __init__(self):
@@ -224,38 +225,47 @@ class DataGenerator:
 
     def generate_feedback(self, answer: Answer, metrics: Dict[str, float]) -> Feedback:
         """Generate feedback for a given answer."""
+        feedback_content = ""
+        
+        # Generate feedback content based on metrics
+        feedback_content += "Strengths:\n"
+        if metrics["technical_accuracy"] > 0.8:
+            feedback_content += "- Strong technical understanding\n"
+        if metrics["completeness"] > 0.8:
+            feedback_content += "- Comprehensive explanation\n"
+        if metrics["clarity"] > 0.8:
+            feedback_content += "- Clear and concise communication\n"
+        if not feedback_content.endswith("\n\n"): # Add newline if strengths were added
+             feedback_content += "\n"
+
+        feedback_content += "Areas for Improvement:\n"
+        if metrics["technical_accuracy"] < 0.8:
+            feedback_content += "- Technical accuracy needs improvement\n"
+        if metrics["completeness"] < 0.8:
+            feedback_content += "- Answer lacks depth\n"
+        if metrics["clarity"] < 0.8:
+            feedback_content += "- Could be more concise\n"
+        if not feedback_content.endswith("\n\n"): # Add newline if improvements were added
+             feedback_content += "\n"
+
+        feedback_content += "Specific Recommendations:\n"
+        if metrics["technical_accuracy"] < 0.9:
+            feedback_content += "- Review fundamental concepts\n"
+        if metrics["completeness"] < 0.9:
+            feedback_content += "- Provide more detailed explanations\n"
+        if metrics["clarity"] < 0.9:
+            feedback_content += "- Structure the answer more clearly\n"
+
+        # Create EvaluationMetrics object (assuming it takes the dict directly)
+        evaluation_metrics = EvaluationMetrics(**metrics)
+
         feedback = Feedback(
             id=f"f_{answer.id}",
             answer_id=answer.id,
-            strengths=[],
-            areas_for_improvement=[],
-            specific_recommendations=[],
+            content=feedback_content.strip(), # Remove trailing newline
+            metrics=evaluation_metrics, # Pass the EvaluationMetrics object
             created_at=datetime.utcnow()
         )
-        
-        # Add strengths
-        if metrics["technical_accuracy"] > 0.8:
-            feedback.strengths.append("Strong technical understanding")
-        if metrics["completeness"] > 0.8:
-            feedback.strengths.append("Comprehensive explanation")
-        if metrics["clarity"] > 0.8:
-            feedback.strengths.append("Clear and concise communication")
-        
-        # Add areas for improvement
-        if metrics["technical_accuracy"] < 0.8:
-            feedback.areas_for_improvement.append("Technical accuracy needs improvement")
-        if metrics["completeness"] < 0.8:
-            feedback.areas_for_improvement.append("Answer lacks depth")
-        if metrics["clarity"] < 0.8:
-            feedback.areas_for_improvement.append("Could be more concise")
-        
-        # Add specific recommendations
-        if metrics["technical_accuracy"] < 0.9:
-            feedback.specific_recommendations.append("Review fundamental concepts")
-        if metrics["completeness"] < 0.9:
-            feedback.specific_recommendations.append("Provide more detailed explanations")
-        if metrics["clarity"] < 0.9:
-            feedback.specific_recommendations.append("Structure the answer more clearly")
         
         return feedback
 

@@ -1,0 +1,92 @@
+[
+  {
+    "question": "What are the key concepts in Python?",
+    "answer": "The key concept behind this is...\n\nTo implement this, you would...\n\nFor better performance, consider...\n\n",
+    "predicted": {
+      "technical_accuracy": 0.4404821991920471,
+      "completeness": 0.4209616184234619,
+      "clarity": 0.4415518045425415,
+      "relevance": 0.3033832311630249,
+      "overall_score": 0.40159472823143005
+    },
+    "ground_truth": {
+      "technical_accuracy": 0.95,
+      "completeness": 0.92,
+      "clarity": 0.91,
+      "relevance": 0.85,
+      "overall_score": 0.91
+    }
+  },
+  {
+    "question": "What are the key concepts in Python?",
+    "answer": "",
+    "predicted": {
+      "technical_accuracy": 0.394438236951828,
+      "completeness": 0.4321848154067993,
+      "clarity": 0.4313962161540985,
+      "relevance": 0.36586254835128784,
+      "overall_score": 0.4059704542160034
+    },
+    "ground_truth": {
+      "technical_accuracy": 0.32,
+      "completeness": 0.57,
+      "clarity": 0.47,
+      "relevance": 0.53,
+      "overall_score": 0.47
+    }
+  },
+  {
+    "question": "What are the key concepts in Python?",
+    "answer": "For better performance, consider...\n\n",
+    "predicted": {
+      "technical_accuracy": 0.3805224597454071,
+      "completeness": 0.43438470363616943,
+      "clarity": 0.4473528265953064,
+      "relevance": 0.3804490268230438,
+      "overall_score": 0.4106772541999817
+    },
+    "ground_truth": {
+      "technical_accuracy": 0.74,
+      "completeness": 0.67,
+      "clarity": 0.65,
+      "relevance": 0.71,
+      "overall_score": 0.69
+    }
+  },
+  {
+    "question": "How do you optimize API Development for performance?",
+    "answer": "The key concept behind this is...\n\nTo implement this, you would...\n\nFor better performance, consider...\n\n",
+    "predicted": {
+      "technical_accuracy": 0.4714100658893585,
+      "completeness": 0.40561169385910034,
+      "clarity": 0.4259859025478363,
+      "relevance": 0.443096399307251,
+      "overall_score": 0.43652603030204773
+    },
+    "ground_truth": {
+      "technical_accuracy": 0.89,
+      "completeness": 0.84,
+      "clarity": 0.91,
+      "relevance": 0.82,
+      "overall_score": 0.86
+    }
+  },
+  {
+    "question": "How do you optimize API Development for performance?",
+    "answer": "",
+    "predicted": {
+      "technical_accuracy": 0.4445645809173584,
+      "completeness": 0.39803212881088257,
+      "clarity": 0.40063753724098206,
+      "relevance": 0.5251160860061646,
+      "overall_score": 0.4420875906944275
+    },
+    "ground_truth": {
+      "technical_accuracy": 0.5,
+      "completeness": 0.52,
+      "clarity": 0.51,
+      "relevance": 0.32,
+      "overall_score": 0.46
+    }
+  }
+]
