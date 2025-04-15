@@ -16,10 +16,10 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Initialize components
-# Provide the GCS bucket name to SpeechToText
-GCS_BUCKET_NAME = "nlp-project-interview-audio-v2"
-stt = SpeechToText(bucket_name=GCS_BUCKET_NAME)
-# Initialize model (will automatically load latest from models/ if available)
+# Initialize SpeechToText with Whisper (default model: "base")
+# GCS_BUCKET_NAME = "nlp-project-interview-audio-v2" # Removed GCS bucket
+stt = SpeechToText() # Whisper STT doesn't need bucket_name
+# Initialize other models (will automatically load latest from models/ if available)
 custom_model = CustomEvaluatorModel()
 feedback_generator = FeedbackGenerator()
 
@@ -71,9 +71,10 @@ async def transcribe_audio(request: TranscriptionRequest):
             raise HTTPException(status_code=400, detail="Invalid base64 audio data")
         
         # Transcribe audio
-        transcript = stt.transcribe_audio(audio_bytes, request.domain)
+        # The domain parameter is removed as Whisper auto-detects language
+        transcript = stt.transcribe_audio(audio_bytes)
         
-        if not transcript:
+        if transcript is None: # Check for None explicitly
             raise HTTPException(status_code=400, detail="Transcription failed")
             
         return {"transcript": transcript}

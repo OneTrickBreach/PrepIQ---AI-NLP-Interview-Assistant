@@ -10,7 +10,7 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 - **Evaluate candidate answers** using custom-trained NLP models.
 - **Provide actionable feedback** highlighting strengths and areas for improvement.
 - **Support multiple roles** including Software Engineer, Data Scientist, DevOps, QA, Mobile Developer, and more.
-- **Enable speech-based answers** with integrated speech-to-text.
+- **Enable speech-based answers** with integrated speech-to-text (using OpenAI Whisper).
 - **Facilitate model training and improvement** with extensible data pipelines.
 
 ---
@@ -30,7 +30,7 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 .
 ├── src/                    # Backend Python code (FastAPI server, models, feedback)
 │   ├── main.py             # FastAPI app entry point
-│   ├── speech_to_text.py   # Google Speech-to-Text integration
+│   ├── speech_to_text.py   # OpenAI Whisper integration
 │   ├── data_generation.py  # Synthetic data generation
 │   ├── models/             # Custom model definitions
 │   ├── feedback/           # Feedback generation logic
@@ -63,16 +63,19 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 
 ```
 
-## Instructions for Running the NLP Final Project
-
-To run this project, you will need the following:
-
-1.  The code from this Git repository.
-2.  The trained model file (`custom_evaluator_best.pt`). You can download it from this Google Drive link: [https://drive.google.com/file/d/1puq4Luf4aBJQUyw6FHLV7jU5yAUOgzX_/view?usp=sharing]
-
-Place the contents of the downloaded `custom_evaluator_best.pt` file in the `models` folder in the root directory of the project. Then, follow the instructions in the rest of this README to set up the environment and run the application.
-
 ## Setup Instructions
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed on your system:
+
+1.  **Python:** Version 3.8 or higher.
+2.  **Git:** For cloning the repository.
+3.  **Node.js and npm:** Required for the frontend application. Download from [https://nodejs.org/](https://nodejs.org/).
+4.  **FFmpeg:** Required by the Whisper library for audio processing.
+    *   **Windows:** Install using Chocolatey (`choco install ffmpeg`) or download from the [FFmpeg website](https://ffmpeg.org/download.html) and add it to your system's PATH.
+    *   **macOS:** Install using Homebrew (`brew install ffmpeg`).
+    *   **Linux:** Install using your package manager (e.g., `sudo apt update && sudo apt install ffmpeg` on Debian/Ubuntu).
 
 ### 1. Clone the Repository
 
@@ -81,75 +84,96 @@ git clone https://github.com/OneTrickBreach/PrepIQ---AI-NLP-Interview-Assistant.
 cd PrepIQ---AI-NLP-Interview-Assistant
 ```
 
-### 2. Python Environment
+### 2. Python Backend Setup
 
-- Create or activate your Conda environment or virtualenv.
-- **Make sure to activate your environment before running any commands below.**
-- Install dependencies:
+- Navigate to the project root directory if you aren't already there.
+- Create and activate a Python virtual environment (recommended):
 
-```bash
-python -m pip install -r requirements.txt
-```
+  ```bash
+  # Create the environment (only needs to be done once)
+  python -m venv .venv 
 
-- **(Optional: For Speech-to-Text)** Ensure you have Google Cloud credentials set up with access to Speech-to-Text and GCS:
-    - Obtain a service account JSON key file from your Google Cloud project. **Do not commit this file to Git.**
-    - Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable on your system to the path of your downloaded key file.
-    - **Note:** The core application (text input/evaluation) will work without this setup.
+  # Activate the environment (do this every time you work on the project)
+  # Windows (PowerShell):
+  .\.venv\Scripts\Activate.ps1
+  # Windows (Command Prompt):
+  # .\.venv\Scripts\activate.bat
+  # macOS/Linux:
+  # source .venv/bin/activate 
+  ```
 
-### 3. Frontend Setup
+- Install Python dependencies:
 
-```bash
-cd frontend
-npm install
-```
+  ```bash
+  # Ensure your virtual environment is active first!
+  pip install -r requirements.txt
+  ```
+  *(Note: This will install PyTorch and Whisper. The first time Whisper runs, it may download the model weights, which can take some time and disk space.)*
 
-### 4. Google Cloud Setup (Optional: For Speech-to-Text)
+### 3. Download the Trained Evaluation Model
 
-- Create a GCS bucket (done: `nlp-project-interview-audio-v2`).
-- Ensure the service account has permissions to upload audio files.
-- Enable Google Cloud Speech-to-Text API.
+The custom-trained evaluation model (`.pt` file) is required for the answer evaluation feature but is **not included** in this repository due to size limits.
 
-### 5. Download the Trained Model
+- Download the latest trained model checkpoint from this link:
+  **[https://drive.google.com/file/d/1puq4Luf4aBJQUyw6FHLV7jU5yAUOgzX_/view?usp=sharing]** *(Link provided by user)*
 
-The trained evaluation model is **not included** in this repository due to size limits.
+- After downloading, place the `.pt` file (e.g., `custom_evaluator_best.pt`) inside the `models/` directory in the project root. The backend will automatically load the latest model file from this directory when started.
 
-Please download the latest trained model checkpoint from this link:
+### 4. Frontend Setup
 
-**[Your Google Drive Link Here]**
+- Navigate to the frontend directory:
 
-After downloading, place the `.pt` file (e.g., `custom_evaluator_best.pt`) inside the `models/` directory.
+  ```bash
+  cd frontend
+  ```
 
-The backend will automatically load the latest model file from `models/` when started.
+- Install Node.js dependencies:
 
-### 6. Generating Sample Data (Optional)
+  ```bash
+  npm install
+  ```
+
+- Go back to the project root directory:
+
+  ```bash
+  cd .. 
+  ```
+
+### 5. Generating Sample Data (Optional)
 
 If you want to generate synthetic sample data for testing or retraining:
 
 ```bash
+# Ensure your Python virtual environment is active
 python scripts/generate_dataset.py
 python scripts/organize_data.py
 ```
 
 > **Note:** This synthetic data is very basic. For real training, replace or augment it with real, annotated examples.
 
-### 7. Running the Backend Server
+### 6. Running the Application
 
-From the project root:
+You need to run the backend and frontend servers simultaneously in separate terminals.
 
-```bash
-python -m src.main
-```
+- **Terminal 1: Run Backend Server**
+  - Make sure you are in the project root directory (`PrepIQ---AI-NLP-Interview-Assistant`).
+  - Activate your Python virtual environment (`.\.venv\Scripts\Activate.ps1` or `source .venv/bin/activate`).
+  - Start the FastAPI server:
 
-### 8. Running the Frontend
+    ```bash
+    python -m src.main
+    ```
 
-In a separate terminal:
+- **Terminal 2: Run Frontend Server**
+  - Open a new terminal.
+  - Navigate to the `frontend` directory: `cd frontend`
+  - Start the React development server:
 
-```bash
-cd frontend
-npm start
-```
+    ```bash
+    npm start
+    ```
 
-The app will be available at `http://localhost:3000`.
+- Once both servers are running, the application should be available in your web browser at `http://localhost:3000`.
 
 ---
 
@@ -158,12 +182,14 @@ The app will be available at `http://localhost:3000`.
 - To train from scratch:
 
 ```bash
+# Ensure virtual environment is active
 python scripts/train_custom_evaluator.py --data_dir organized_data/ --output_dir models/ --num_epochs 20 --batch_size 8
 ```
 
 - To continue training from a checkpoint:
 
 ```bash
+# Ensure virtual environment is active
 python scripts/train_custom_evaluator.py --data_dir organized_data/ --output_dir models/ --num_epochs 10 --batch_size 8 --load_checkpoint "models/custom_evaluator_best.pt"
 ```
 
@@ -174,6 +200,6 @@ python scripts/train_custom_evaluator.py --data_dir organized_data/ --output_dir
 - The `.gitignore` excludes large data/model directories and environment files.
 - Placeholder files are included in excluded directories to preserve structure.
 - You can customize roles, questions, and feedback templates by editing the data files or generation scripts.
-- For speech-to-text, audio longer than 60 seconds is not supported via Google Cloud Storage.
+- Speech-to-text is now handled locally using Whisper. Performance depends on your hardware and the chosen Whisper model size (default is "base").
 
 ---

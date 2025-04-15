@@ -4,6 +4,7 @@ PLAN.md
 TASK.md
 SPEECH-TO-TEXT.md
 .windsurfrules
+.venv/
 
 # Python specific
 __pycache__/
