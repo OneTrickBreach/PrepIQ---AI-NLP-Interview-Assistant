@@ -55,18 +55,22 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 │   │   └── pages/          # App pages (Interview, Results, etc.)
 │   └── public/
 │
-├── data/                   # Raw data files (excluded from Git)
-├── organized_data/         # Processed data for training (excluded from Git)
-├── models/                 # Saved model checkpoints (excluded from Git)
-├── results/                # Evaluation results (excluded from Git)
-├── test_data/              # Test datasets (excluded from Git)
+├── organized_data/         # Processed data for training
+├── models/                 # Saved model checkpoints
 ├── requirements.txt        # Python dependencies
 ├── .gitignore              # Git ignore rules
 ├── README.md               # This file
-└── .windsurfrules          # Local environment rules (excluded from Git)
+
 ```
 
----
+## Instructions for Running the NLP Final Project
+
+To run this project, you will need the following:
+
+1.  The code from this Git repository.
+2.  The trained model file (`custom_evaluator_best.pt`). You can download it from this Google Drive link: [https://drive.google.com/file/d/1puq4Luf4aBJQUyw6FHLV7jU5yAUOgzX_/view?usp=sharing]
+
+Place the contents of the downloaded `custom_evaluator_best.pt` file in the `models` folder in the root directory of the project. Then, follow the instructions in the rest of this README to set up the environment and run the application.
 
 ## Setup Instructions
 
@@ -87,8 +91,10 @@ cd PrepIQ---AI-NLP-Interview-Assistant
 python -m pip install -r requirements.txt
 ```
 
-- Ensure you have **Google Cloud credentials** set up with access to Speech-to-Text and GCS:
-    - Set `GOOGLE_APPLICATION_CREDENTIALS` environment variable to your service account JSON key file.
+- **(Optional: For Speech-to-Text)** Ensure you have Google Cloud credentials set up with access to Speech-to-Text and GCS:
+    - Obtain a service account JSON key file from your Google Cloud project. **Do not commit this file to Git.**
+    - Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable on your system to the path of your downloaded key file.
+    - **Note:** The core application (text input/evaluation) will work without this setup.
 
 ### 3. Frontend Setup
 
@@ -97,7 +103,7 @@ cd frontend
 npm install
 ```
 
-### 4. Google Cloud Setup
+### 4. Google Cloud Setup (Optional: For Speech-to-Text)
 
 - Create a GCS bucket (done: `nlp-project-interview-audio-v2`).
 - Ensure the service account has permissions to upload audio files.
@@ -147,7 +153,7 @@ The app will be available at `http://localhost:3000`.
 
 ---
 
-## Training the Evaluation Model
+## Training the Evaluation Model (Optional)
 
 - To train from scratch:
 
@@ -168,12 +174,6 @@ python scripts/train_custom_evaluator.py --data_dir organized_data/ --output_dir
 - The `.gitignore` excludes large data/model directories and environment files.
 - Placeholder files are included in excluded directories to preserve structure.
 - You can customize roles, questions, and feedback templates by editing the data files or generation scripts.
-- For speech-to-text, audio longer than 60 seconds is supported via Google Cloud Storage and asynchronous recognition.
-
----
-
-## License
-
-*Add your license information here.*
+- For speech-to-text, audio longer than 60 seconds is not supported via Google Cloud Storage.
 
 ---

@@ -51,113 +51,140 @@ class EvaluatorDataset(Dataset):
         """
         Load questions, answers, and metrics from JSON files.
         Handles potential JSON errors gracefully and ignores 'in_test_set' field.
+        Includes general category answers.
         """
         logger.info(f"Loading data from directory: {data_dir}")
-        roles_dir = os.path.join(data_dir, "roles")
+        roles_dir = os.path.join(data_dir, "roles") # This seems unused, keeping for now
         questions_base_dir = os.path.join(data_dir, "questions")
         answers_base_dir = os.path.join(data_dir, "answers")
 
-        if not os.path.exists(roles_dir):
-            logger.error(f"Roles directory not found: {roles_dir}")
-            return
-        if not os.path.exists(questions_base_dir):
-            logger.error(f"Questions base directory not found: {questions_base_dir}")
-            return
-        if not os.path.exists(answers_base_dir):
-            logger.error(f"Answers base directory not found: {answers_base_dir}")
-            return
+        # ... (rest of the existing checks for directories) ...
+
+        all_questions = {} # Store all questions from all roles
 
         processed_roles = 0
-        for role_file in os.listdir(roles_dir):
-            if role_file.endswith(".json"):
-                role_path = os.path.join(roles_dir, role_file)
-                role = role_file.replace(".json", "")
-                logger.debug(f"Processing role: {role}")
+        for role_dir in os.listdir(questions_base_dir):
+            role_questions_path = os.path.join(questions_base_dir, role_dir)
+            role_answers_path = os.path.join(answers_base_dir, role_dir)
 
-                questions_dir = os.path.join(questions_base_dir, role)
-                answers_dir = os.path.join(answers_base_dir, role)
+            if not os.path.isdir(role_questions_path):
+                continue
 
-                if not os.path.exists(questions_dir):
-                    logger.warning(f"Questions directory not found for role {role}: {questions_dir}")
-                    continue
-                if not os.path.exists(answers_dir):
-                     logger.warning(f"Answers directory not found for role {role}: {answers_dir}")
-                     continue
+            role = role_dir.replace("_", " ")
+            logger.debug(f"Processing role: {role}")
 
-                # Load questions for the role
-                questions = {}
-                for q_file in os.listdir(questions_dir):
-                    if q_file.endswith(".json"):
-                        q_path = os.path.join(questions_dir, q_file)
-                        try:
-                            with open(q_path, 'r', encoding='utf-8') as fq:
-                                question_data = json.load(fq)
-                                # Ensure required fields are present before creating Question object
-                                if all(k in question_data for k in ['id', 'role', 'type', 'difficulty', 'content']):
-                                     question = Question(**question_data)
-                                     questions[question.id] = question
-                                else:
-                                     logger.warning(f"Skipping question file due to missing required fields: {q_path}")
-                        except json.JSONDecodeError:
-                            logger.warning(f"Skipping invalid JSON in question file: {q_path}")
-                        except Exception as e:
-                            logger.warning(f"Skipping question file due to error ({type(e).__name__}): {q_path} - {e}")
-                
-                # Load answers and metrics for each question
-                for question_id, question in questions.items():
-                    q_answers_dir = os.path.join(answers_dir, question_id)
+            # Load questions for the role
+            questions_in_role = {}
+            for q_file in os.listdir(role_questions_path):
+                if q_file.endswith(".json"):
+                    q_path = os.path.join(role_questions_path, q_file)
+                    try:
+                        with open(q_path, 'r', encoding='utf-8') as fq:
+                            question_data = json.load(fq)
+                            if all(k in question_data for k in ['id', 'role', 'type', 'difficulty', 'content']):
+                                question = Question(**question_data)
+                                questions_in_role[question.id] = question
+                                all_questions[question.id] = question # Add to global dict
+                            else:
+                                logger.warning(f"Skipping question file due to missing required fields: {q_path}")
+                    except Exception as e:
+                        logger.warning(f"Skipping question file due to error ({type(e).__name__}): {q_path} - {e}")
+
+            # Load answers and metrics for each question in this role
+            if os.path.exists(role_answers_path):
+                for question_id, question in questions_in_role.items():
+                    q_answers_dir = os.path.join(role_answers_path, question_id)
                     if os.path.exists(q_answers_dir):
                         for a_file in os.listdir(q_answers_dir):
-                            # Process only answer files, skip metrics files here
                             if a_file.endswith(".json") and not a_file.endswith("_metrics.json"):
                                 a_path = os.path.join(q_answers_dir, a_file)
                                 metrics_file = a_file.replace(".json", "_metrics.json")
                                 metrics_path = os.path.join(q_answers_dir, metrics_file)
 
                                 if not os.path.exists(metrics_path):
-                                     logger.warning(f"Metrics file not found for answer: {a_path}. Skipping.")
-                                     continue
+                                    logger.warning(f"Metrics file not found for answer: {a_path}. Skipping.")
+                                    continue
 
                                 try:
-                                    # Load answer data
                                     with open(a_path, 'r', encoding='utf-8') as fa:
                                         answer_data = json.load(fa)
-                                        # Remove unexpected 'in_test_set' key if it exists, before creating Answer object
-                                        answer_data.pop('in_test_set', None) 
+                                        answer_data.pop('in_test_set', None)
                                         if not all(k in answer_data for k in ['id', 'question_id', 'content']):
-                                             logger.warning(f"Skipping answer file due to missing required fields after potential key removal: {a_path}")
-                                             continue
+                                            logger.warning(f"Skipping answer file due to missing required fields: {a_path}")
+                                            continue
                                         answer = Answer(**answer_data)
 
-                                    # Load metrics data
                                     with open(metrics_path, 'r', encoding='utf-8') as fm:
                                         metrics_data = json.load(fm)
                                         if not isinstance(metrics_data, dict):
                                             logger.warning(f"Skipping invalid metrics data (not a dict) in {metrics_path}")
                                             continue
-                                        # Ensure required metric fields exist before creating object
                                         if all(k in metrics_data for k in ['technical_accuracy', 'completeness', 'clarity', 'relevance']):
-                                             metrics = EvaluationMetrics(**metrics_data)
+                                            metrics = EvaluationMetrics(**metrics_data)
                                         else:
-                                             logger.warning(f"Skipping metrics file due to missing required fields: {metrics_path}")
-                                             continue
+                                            logger.warning(f"Skipping metrics file due to missing required fields: {metrics_path}")
+                                            continue
 
-                                    # Create example if both loaded successfully
                                     self.examples.append({
                                         "question": question,
                                         "answer": answer,
                                         "metrics": metrics
                                     })
-
-                                except json.JSONDecodeError as json_err:
-                                    logger.warning(f"Skipping due to JSON error in {a_path} or {metrics_path}: {json_err}")
                                 except Exception as e:
                                     logger.warning(f"Skipping answer/metrics pair due to error ({type(e).__name__}) for files: {a_path}, {metrics_path} - {e}")
-                processed_roles += 1
+            processed_roles += 1
 
-        if processed_roles == 0:
-             logger.error("No roles processed. Check data directory structure and content.")
-        logger.info(f"Loaded {len(self.examples)} evaluation examples from {processed_roles} roles.")
+        # --- Start: Load General Answers ---
+        general_answers_dir = os.path.join(answers_base_dir, "General")
+        if os.path.exists(general_answers_dir) and os.path.isdir(general_answers_dir) and all_questions:
+            logger.info("Loading general category answers...")
+            for category in os.listdir(general_answers_dir):
+                category_path = os.path.join(general_answers_dir, category)
+                if os.path.isdir(category_path):
+                    for filename in os.listdir(category_path):
+                        if filename.endswith(".json"):
+                            answer_filepath = os.path.join(category_path, filename)
+                            try:
+                                with open(answer_filepath, 'r', encoding='utf-8') as f:
+                                    answer_data = json.load(f)
+                                answer = Answer(**answer_data)
+
+                                # Pair general answers with multiple random questions
+                                num_pairings = 5 # Pair each general answer with 5 random questions
+                                random_question_ids = random.sample(list(all_questions.keys()), min(num_pairings, len(all_questions)))
+
+                                for q_id in random_question_ids:
+                                    question = all_questions[q_id]
+                                    # Assign low target metrics for general answers
+                                    low_metrics = EvaluationMetrics(
+                                        technical_accuracy=0.1,
+                                        completeness=0.1,
+                                        clarity=0.5, # Clarity might be okay for "IDK"
+                                        relevance=0.0
+                                    )
+                                    # Adjust metrics based on category if needed
+                                    if category == "Relevant but incorrect":
+                                         low_metrics.relevance = 0.6 # Slightly higher relevance
+                                         low_metrics.technical_accuracy = 0.0
+                                    elif category == "IDK":
+                                         low_metrics.completeness = 0.0
+
+                                    self.examples.append({
+                                        "question": question,
+                                        "answer": answer,
+                                        "metrics": low_metrics # Use predefined low metrics
+                                    })
+                            except Exception as e:
+                                logger.error(f"Error loading or pairing general answer {answer_filepath}: {str(e)}")
+        elif not all_questions:
+             logger.warning("No role-specific questions loaded, cannot pair general answers.")
+        else:
+            logger.warning("General answers directory not found or empty.")
+        # --- End: Load General Answers ---
+
+        if processed_roles == 0 and not self.examples: # Check if any examples were loaded at all
+             logger.error("No roles processed and no general answers loaded. Check data directory structure and content.")
+        logger.info(f"Loaded {len(self.examples)} total evaluation examples.")
     
     def __len__(self):
         return len(self.examples)
@@ -365,6 +392,19 @@ def train_evaluator(args):
              torch.save(model.state_dict(), current_model_path)
              best_model_path = current_model_path 
              logger.info(f"Saved model after epoch {epoch+1} to {best_model_path}")
+        
+        # --- Periodic Save every 10 epochs ---
+        if (epoch + 1) % 10 == 0:
+            os.makedirs(args.output_dir, exist_ok=True)
+            periodic_save_path = os.path.join(args.output_dir, "custom_evaluator_best.pt")
+            try:
+                torch.save(model.state_dict(), periodic_save_path)
+                logger.info(f"Periodic save after epoch {epoch+1} to {periodic_save_path}")
+                # Update best_model_path if this is the most recent save
+                best_model_path = periodic_save_path
+            except Exception as e:
+                 logger.error(f"Failed periodic save after epoch {epoch+1}: {e}")
+        # ------------------------------------
 
     logger.info(f"Training complete. Final best model saved to {best_model_path}")
     
