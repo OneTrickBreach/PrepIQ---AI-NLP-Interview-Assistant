@@ -32,11 +32,11 @@ Thumbs.db
 # Data / Models / Logs / Cache (Potentially large or generated)
 # data/
 # organized_data/
-models/  # Re-excluded models directory after uploading placeholder
-results/
-error_log.txt
+# models/  # Re-excluded models directory after uploading placeholder
+# results/
+# error_log.txt
 .pytest_cache/
-test_data/
+# test_data/
 
 # Frontend specific (Node)
 frontend/node_modules/
