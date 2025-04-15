@@ -55,7 +55,7 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 │   │   └── pages/          # App pages (Interview, Results, etc.)
 │   └── public/
 │
-├── organized_data/         # Processed data for training (excluded from Git)
+├── organized_data/         # Processed data for training
 ├── models/                 # Saved model checkpoints
 ├── requirements.txt        # Python dependencies
 ├── .gitignore              # Git ignore rules
@@ -68,10 +68,9 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 To run this project, you will need the following:
 
 1.  The code from this Git repository.
-2.  The dataset, stored in the `organized_data` folder. Due to its size, this folder is not included in the repository. You can download it from this Google Drive link: [PLACEHOLDER - Google Drive link for nlp_final_project_organized_data.rar]
-3.  The trained model file (`custom_evaluator_best.pt`). You can download it from this Google Drive link: [PLACEHOLDER - Google Drive link for custom_evaluator_best.pt]
+2.  The trained model file (`custom_evaluator_best.pt`). You can download it from this Google Drive link: [PLACEHOLDER - Google Drive link for custom_evaluator_best.pt]
 
-Place the contents of the downloaded rar file into the `organized_data` folder and the `custom_evaluator_best.pt` file in the `models` folder in the root directory of the project. Then, follow the instructions in the rest of this README to set up the environment and run the application.
+Place the contents of the downloaded `custom_evaluator_best.pt` file in the `models` folder in the root directory of the project. Then, follow the instructions in the rest of this README to set up the environment and run the application.
 
 ## Setup Instructions
 
