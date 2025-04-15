@@ -2,9 +2,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, Dict, List
 import logging
-import base64 # Import base64 module
+import base64  # Import base64 module
+import os
+import json
 from src.speech_to_text import SpeechToText
-from src.schemas import Question, Answer, EvaluationMetrics, Feedback # Removed RoleDetails import
+from src.schemas import Question, Answer, EvaluationMetrics, Feedback  # Removed RoleDetails import
 from config.config import settings
 from src.models.custom_evaluator import CustomEvaluatorModel
 from src.feedback.generator import FeedbackGenerator
@@ -26,6 +28,8 @@ app = FastAPI(
     version=settings.VERSION,
     description="AI-NLP Interview Assistant API"
 )
+
+QUESTIONS_DIR = os.path.join("organized_data", "questions")
 
 class TranscriptionRequest(BaseModel):
     audio_content: str
@@ -132,79 +136,100 @@ async def evaluate_answer(request: EvaluationRequest):
         logger.exception(f"Evaluation error occurred: {str(e)}") # Use logger.exception for traceback
         raise HTTPException(status_code=500, detail=f"Failed to evaluate answer: {str(e)}")
 
-# --- Mock Question Data (Placeholder) ---
-MOCK_QUESTIONS = {
-    "technical": {
-        "Software Engineer": [
-            "Explain the difference between depth-first search and breadth-first search.",
-            "What are the principles of object-oriented programming?",
-            "Explain time and space complexity."
-        ],
-        "Data Scientist": [
-            "Describe how you would handle imbalanced datasets.",
-            "Explain the difference between supervised and unsupervised learning.",
-            "How would you deal with missing data?"
-        ],
-         "Default": [
-            "What are key technical skills for this role?",
-            "Describe a challenging technical problem you solved.",
-            "How do you stay updated with technologies?"
-        ]
-    },
-    "behavioral": {
-         "Default": [
-            "Describe a challenging project and how you overcame obstacles.",
-            "Tell me about working under pressure.",
-            "Give an example of learning a new technology quickly."
-         ]
-    }
-}
-
-MOCK_SKILLS = {
-    "Software Engineer": ["Algorithms", "Data Structures", "Problem Solving", "OOP"],
-    "Data Scientist": ["Machine Learning", "Statistics", "Data Analysis", "Python"],
-    "Default": ["Technical Knowledge", "Problem Solving", "Communication"]
-}
-
 import random
 import datetime
 
-@app.post("/api/questions", response_model=Question) # Added /api prefix
+@app.post("/api/questions", response_model=Question)  # Added /api prefix
 async def generate_question_endpoint(request: QuestionRequest):
     """
     Generate an interview question based on role, difficulty, and type.
-    (Currently uses placeholder logic)
+    Loads questions from JSON files in organized_data/questions/.
     """
-    logger.info(f"Generating question for role: {request.role}, type: {request.type}")
+    logger.info(f"Generating question for role: {request.role}, type: {request.type}, difficulty: {request.difficulty}")
     try:
-        q_type = request.type if request.type in MOCK_QUESTIONS else "technical"
-        role_key = request.role if request.role in MOCK_QUESTIONS[q_type] else "Default"
-        
-        # Handle case where role might exist in technical but not behavioral
-        if role_key == "Default" and request.role in MOCK_QUESTIONS.get("technical", {}):
-             role_key = request.role # Use specific role if available in technical
-        elif role_key == "Default" and q_type == "behavioral":
-             role_key = "Default" # Behavioral often uses default
+        role_dir_name = request.role.replace(" ", "_")
+        role_dir_path = os.path.join(QUESTIONS_DIR, role_dir_name)
+        default_dir_path = os.path.join(QUESTIONS_DIR, "Default")
 
-        question_list = MOCK_QUESTIONS[q_type].get(role_key, MOCK_QUESTIONS[q_type]["Default"])
-        content = random.choice(question_list)
-        
-        skills_role_key = request.role if request.role in MOCK_SKILLS else "Default"
-        skills = random.sample(MOCK_SKILLS.get(skills_role_key, MOCK_SKILLS["Default"]), k=min(3, len(MOCK_SKILLS.get(skills_role_key, MOCK_SKILLS["Default"]))))
+        target_dir_path = role_dir_path
+        if not os.path.isdir(target_dir_path):
+            logger.warning(f"Role directory not found: {role_dir_path}. Trying default directory.")
+            target_dir_path = default_dir_path
+            if not os.path.isdir(target_dir_path):
+                logger.error(f"Default question directory not found: {target_dir_path}")
+                raise HTTPException(status_code=404, detail="Question directory not found for role or default.")
+
+        all_questions_in_dir = []
+        json_files = [f for f in os.listdir(target_dir_path) if f.endswith('.json')]
+
+        if not json_files:
+             logger.error(f"No JSON question files found in directory: {target_dir_path}")
+             raise HTTPException(status_code=404, detail="No question files found in the directory.")
+
+        for filename in json_files:
+            filepath = os.path.join(target_dir_path, filename)
+            try:
+                with open(filepath, "r") as f:
+                    question_data = json.load(f)
+                    # Assuming each file contains ONE question object directly
+                    if isinstance(question_data, dict):
+                         all_questions_in_dir.append(question_data)
+                    else:
+                         logger.warning(f"Unexpected data format in {filepath}, expected a single JSON object.")
+            except json.JSONDecodeError:
+                logger.error(f"Failed to decode JSON from {filepath}")
+                # Optionally skip this file or raise an error
+                continue # Skip malformed files
+            except Exception as file_error:
+                 logger.error(f"Error reading file {filepath}: {file_error}")
+                 continue # Skip files with other read errors
+
+        if not all_questions_in_dir:
+             logger.error(f"No valid questions loaded from directory: {target_dir_path}")
+             raise HTTPException(status_code=404, detail="No valid questions could be loaded.")
+
+        # Filter questions based on type and difficulty
+        filtered_questions = [
+            q for q in all_questions_in_dir
+            if q.get("type", "technical").lower() == request.type.lower() and \
+               q.get("difficulty", "medium").lower() == request.difficulty.lower()
+        ]
+
+        selected_question = None
+        if filtered_questions:
+            selected_question = random.choice(filtered_questions)
+            logger.info(f"Found {len(filtered_questions)} matching questions. Selected one.")
+        else:
+            # Fallback: If no questions match criteria, pick a random one from the directory
+            logger.warning(f"No questions found matching criteria in {target_dir_path}. Selecting a random question from the directory.")
+            selected_question = random.choice(all_questions_in_dir)
+
+        if not selected_question:
+             # This case should ideally not be reached if all_questions_in_dir is not empty
+             logger.error(f"Could not select any question from {target_dir_path}")
+             raise HTTPException(status_code=500, detail="Failed to select a question.")
+
+        content = selected_question.get("content")
+        skills = selected_question.get("expected_skills", [])
 
         question_obj = Question(
-            id=f"q_{random.randint(1000, 9999)}", # Generate random ID
-            role=request.role,
-            type=request.type,
-            difficulty=request.difficulty,
+            id=selected_question.get("id", f"q_{random.randint(1000, 9999)}"), # Use ID from file if available
+            role=request.role, # Keep requested role
+            type=selected_question.get("type", request.type), # Use type from file
+            difficulty=selected_question.get("difficulty", request.difficulty), # Use difficulty from file
             content=content,
             expected_skills=skills,
-            created_at=datetime.datetime.now(datetime.timezone.utc).isoformat()
+            created_at=selected_question.get("created_at", datetime.datetime.now(datetime.timezone.utc).isoformat()) # Use created_at from file if available
         )
         return question_obj
+
+    except FileNotFoundError:
+        # This specific error might be less likely now with isdir checks, but keep for safety
+        logger.error(f"Question directory check failed unexpectedly.")
+        raise HTTPException(status_code=404, detail="Question directory path error.")
     except Exception as e:
-        logger.error(f"Question generation error: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to generate question")
+        logger.exception(f"Question generation error: {str(e)}") # Log full traceback
+        raise HTTPException(status_code=500, detail=f"Failed to generate question: {str(e)}")
 
 
 @app.post("/api/generate-feedback") # Added /api prefix
