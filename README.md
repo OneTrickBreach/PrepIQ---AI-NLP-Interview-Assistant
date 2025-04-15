@@ -68,7 +68,7 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 To run this project, you will need the following:
 
 1.  The code from this Git repository.
-2.  The trained model file (`custom_evaluator_best.pt`). You can download it from this Google Drive link: [PLACEHOLDER - Google Drive link for custom_evaluator_best.pt]
+2.  The trained model file (`custom_evaluator_best.pt`). You can download it from this Google Drive link: [https://drive.google.com/file/d/1puq4Luf4aBJQUyw6FHLV7jU5yAUOgzX_/view?usp=sharing]
 
 Place the contents of the downloaded `custom_evaluator_best.pt` file in the `models` folder in the root directory of the project. Then, follow the instructions in the rest of this README to set up the environment and run the application.
 
