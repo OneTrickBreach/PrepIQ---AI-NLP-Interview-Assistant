@@ -30,8 +30,8 @@ env/
 Thumbs.db
 
 # Data / Models / Logs / Cache (Potentially large or generated)
-data/
-organized_data/
+# data/
+# organized_data/
 models/  # Re-excluded models directory after uploading placeholder
 results/
 error_log.txt

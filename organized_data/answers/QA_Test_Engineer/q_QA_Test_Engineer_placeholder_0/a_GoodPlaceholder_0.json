@@ -1,0 +1,8 @@
+{
+  "id": "a_GoodPlaceholder_0",
+  "question_id": "q_QA_Test_Engineer_placeholder_0",
+  "content": "Functional testing verifies *what* the system does, checking if features work according to specified requirements (e.g., does the login button work?). Non-functional testing evaluates *how* the system performs, focusing on aspects like performance (speed, load handling), usability (ease of use), security (vulnerability resistance), and reliability (stability over time).",
+  "audio_source": null,
+  "confidence": 1.0,
+  "created_at": "2025-04-08T20:36:30Z"
+}

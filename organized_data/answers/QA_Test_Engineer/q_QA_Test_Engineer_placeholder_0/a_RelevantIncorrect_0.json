@@ -1,0 +1,8 @@
+{
+  "id": "a_RelevantIncorrect_0",
+  "question_id": "q_QA_Test_Engineer_placeholder_0",
+  "content": "The main difference is the scope. Functional testing, like unit testing, focuses on individual components or functions in isolation to ensure they work correctly. Non-functional testing, like integration testing, verifies that different components work together as expected when integrated.",
+  "audio_source": null,
+  "confidence": 1.0,
+  "created_at": "2025-04-11T19:01:30Z" 
+}

@@ -1,0 +1,8 @@
+{
+  "id": "a_GoodPlaceholder_0",
+  "question_id": "q_Mobile_Developer_placeholder_0",
+  "content": "Native development uses platform-specific languages like Swift for iOS and Kotlin for Android, offering the best performance and access to device features. Cross-platform development uses frameworks like React Native or Flutter with a single codebase (e.g., JavaScript or Dart) to target both platforms, which speeds up development but might compromise performance or native feature access slightly.",
+  "audio_source": null,
+  "confidence": 1.0,
+  "created_at": "2025-04-08T20:35:40Z"
+}
