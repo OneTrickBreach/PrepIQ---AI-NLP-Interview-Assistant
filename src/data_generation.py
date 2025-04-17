@@ -284,19 +284,20 @@ class DataGenerator:
             
             # Generate questions
             questions = self.generate_interview_questions(role)
-            questions_data = [{**q.dict(), "created_at": q.created_at.isoformat()} for q in questions]
+            questions_data = []
+            questions_data = [{**q.dict(), "created_at": q.created_at.isoformat()} for q in questions] # Reverted to .dict() and list comprehension
             with open(os.path.join(output_dir, f"{safe_role_name}_questions.json"), "w") as f:
                 json.dump(questions_data, f, indent=2)
-            
+
             # Generate answers and feedback
             answers = []
             feedbacks = []
-            
+
             for question in questions:
                 for quality in ["high", "medium", "low"]:
                     answer = self.generate_sample_answer(question, quality)
                     answers.append(answer)
-                    
+
                     # Evaluate answer
                     evaluator = InterviewMetrics()
                     metrics = evaluator.evaluate_answer(
@@ -304,17 +305,17 @@ class DataGenerator:
                         answer.content,
                         question.expected_skills
                     )
-                    
+
                     feedback = self.generate_feedback(answer, metrics)
                     feedbacks.append(feedback)
-            
+
             # Save answers
-            answers_data = [{**a.dict(), "created_at": a.created_at.isoformat()} for a in answers]
+            answers_data = [{**a.dict(), "created_at": a.created_at.isoformat()} for a in answers] # Reverted to .dict() and list comprehension
             with open(os.path.join(output_dir, f"{safe_role_name}_answers.json"), "w") as f:
                 json.dump(answers_data, f, indent=2)
-            
+
             # Save feedback
-            feedback_data = [{**f.dict(), "created_at": f.created_at.isoformat()} for f in feedbacks]
+            feedback_data = [{**f.dict(), "created_at": f.created_at.isoformat()} for f in feedbacks] # Reverted to .dict() and list comprehension
             with open(os.path.join(output_dir, f"{safe_role_name}_feedback.json"), "w") as f:
                 json.dump(feedback_data, f, indent=2)
 

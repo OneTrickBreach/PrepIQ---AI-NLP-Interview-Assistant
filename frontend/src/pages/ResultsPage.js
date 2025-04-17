@@ -1,5 +1,7 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react'; // Added useRef
 import { useLocation, useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -14,7 +16,7 @@ import ReactMarkdown from 'react-markdown';
 import ReplayIcon from '@mui/icons-material/Replay';
 import SaveIcon from '@mui/icons-material/Save';
 import HomeIcon from '@mui/icons-material/Home';
-import ShareIcon from '@mui/icons-material/Share';
+// import ShareIcon from '@mui/icons-material/Share'; // Removed ShareIcon import
 import Chip from '@mui/material/Chip';
 
 // Progress bar with label component
@@ -61,6 +63,7 @@ const getColorForScore = (score) => {
 const ResultsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const resultsRef = useRef(null); // Create a ref for the area to capture
   
   // Get the question, answer, and feedback from location state
   const { question, answer, feedback } = location.state || {};
@@ -83,26 +86,79 @@ const ResultsPage = () => {
     navigate('/interview');
   };
   
-  // Handle saving results (dummy function for demo)
+  // Handle saving results as PDF
   const handleSaveResults = () => {
-    const resultsJson = JSON.stringify({ question, answer, feedback }, null, 2);
-    const blob = new Blob([resultsJson], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `interview-results-${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(a);
-    a.click();
-    
-    URL.revokeObjectURL(url);
-    document.body.removeChild(a);
+    const input = resultsRef.current;
+    if (!input) {
+      console.error("Results area ref not found!");
+      alert("Could not find the results content to save.");
+      return;
+    }
+
+    console.log("Starting PDF generation...");
+    // Add a temporary class for styling during capture if needed
+    input.classList.add('pdf-capture-active');
+
+    html2canvas(input, {
+      scale: 2.5, // Slightly increased scale for potentially better multi-page quality
+      useCORS: true,
+      logging: true, // Enable logging for debugging
+      // Attempt to capture full height even if scrollable
+      windowHeight: input.scrollHeight,
+      scrollY: -window.scrollY // Account for page scroll position
+    })
+    .then((canvas) => {
+      console.log("Canvas generated, width:", canvas.width, "height:", canvas.height);
+      input.classList.remove('pdf-capture-active'); // Remove temporary class
+      const imgData = canvas.toDataURL('image/png');
+      
+      // Use standard A4 size in points (pt)
+      const pdf = new jsPDF({
+        orientation: 'p', // portrait
+        unit: 'pt',
+        format: 'a4'
+      });
+
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      console.log("PDF Page dimensions (pt):", pageWidth, "x", pageHeight);
+
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      
+      // Calculate the image height when scaled to fit the PDF page width
+      const ratio = imgWidth / imgHeight;
+      const pdfImageWidth = pageWidth;
+      const pdfImageHeight = pdfImageWidth / ratio;
+      console.log("Scaled image dimensions (pt):", pdfImageWidth, "x", pdfImageHeight);
+
+      // Calculate the number of pages needed
+      const totalPages = Math.ceil(pdfImageHeight / pageHeight);
+      console.log("Total pages needed:", totalPages);
+
+      // Add the image to potentially multiple pages
+      for (let i = 0; i < totalPages; i++) {
+        if (i > 0) {
+          pdf.addPage();
+        }
+        // Calculate the Y position to shift the image up on subsequent pages
+        const yPos = -(pageHeight * i);
+        console.log(`Adding image to page ${i + 1} at yPos: ${yPos}`);
+        pdf.addImage(imgData, 'PNG', 0, yPos, pdfImageWidth, pdfImageHeight);
+      }
+
+      pdf.save(`PrepIQ-Interview-Results-${new Date().toISOString().slice(0, 10)}.pdf`);
+      console.log("PDF saved successfully.");
+
+    })
+    .catch(err => {
+      input.classList.remove('pdf-capture-active'); // Ensure class is removed on error
+      console.error("Error generating PDF:", err);
+      alert("Failed to generate PDF. Check the console for details.");
+    });
   };
   
-  // Handle sharing results (dummy function for demo)
-  const handleShareResults = () => {
-    alert('Share functionality would be implemented here in a production app.');
-  };
+  // Removed handleShareResults function
   
   return (
     <Box sx={{ py: 4 }}>
@@ -110,7 +166,8 @@ const ResultsPage = () => {
         Interview Results
       </Typography>
       
-      <Grid container spacing={4}>
+      {/* Add the ref to the main container we want to capture */}
+      <Grid container spacing={4} ref={resultsRef}>
         {/* Question Section */}
         <Grid item xs={12} md={4}>
           <Card sx={{ height: '100%' }}>
@@ -168,7 +225,7 @@ const ResultsPage = () => {
               Feedback & Evaluation
             </Typography>
             
-            <Grid container spacing={4}>
+            <Grid container spacing={4} sx={{ display: 'flex', justifyContent: 'center' }}> {/* Added centering styles */}
               <Grid item xs={12} md={7}>
                 <Box sx={{ mt: 2 }}>
                   <ReactMarkdown>
@@ -237,15 +294,9 @@ const ResultsPage = () => {
         >
           Save Results
         </Button>
-        <Button 
-          variant="outlined" 
-          startIcon={<ShareIcon />}
-          onClick={handleShareResults}
-        >
-          Share Results
-        </Button>
-        <Button 
-          variant="outlined" 
+        {/* Removed Share Results Button */}
+        <Button
+          variant="outlined"
           startIcon={<HomeIcon />}
           onClick={() => navigate('/')}
         >

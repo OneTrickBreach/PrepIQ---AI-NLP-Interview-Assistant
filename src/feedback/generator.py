@@ -369,66 +369,65 @@ class FeedbackGenerator:
         
         return strengths, improvements
     
-    def _generate_content(self, question: Question, answer: Answer, metrics: EvaluationMetrics, 
+    def _generate_content(self, question: Question, answer: Answer, metrics: EvaluationMetrics,
                           strengths: List[str], improvements: List[str]) -> str:
         """
-        Generate the feedback content string.
-        
+        Generate detailed feedback content including strengths and areas for improvement.
+
         Args:
             question: Original question
             answer: Answer being evaluated
             metrics: Evaluation metrics
-            strengths: Identified strengths
-            improvements: Identified areas for improvement
-            
+            strengths: Identified strengths (derived from metrics analysis)
+            improvements: Identified areas for improvement (derived from metrics analysis)
+
         Returns:
-            Formatted feedback content
+            Detailed feedback content string.
         """
-        # Start with overall assessment
+        feedback_parts = []
+
+        # 1. Overall Assessment Sentence based on overall score
         if metrics.overall_score >= 0.8:
-            overall = np.random.choice(self.templates["general"]["positive"])
+            overall = "Overall, your answer is strong and effectively addresses the key aspects of the question."
         elif metrics.overall_score >= 0.5:
-            overall = np.random.choice(self.templates["general"]["neutral"])
+            overall = "Your answer covers some key aspects but could be more comprehensive and precise in certain areas."
         else:
-            overall = np.random.choice(self.templates["general"]["negative"])
-        
-        # Format the feedback
-        content = f"## Feedback on your answer to: '{question.content}'\n\n"
-        content += f"### Overall Assessment\n{overall}\n\n"
-        
-        # Add strengths section
+            overall = "Your answer seems to miss some core requirements of the question or lacks sufficient detail and accuracy."
+        feedback_parts.append(overall)
+        feedback_parts.append("\n") # Add a newline for better readability
+
+        # 2. Strengths Section
         if strengths:
-            content += "### Strengths\n"
-            for strength in strengths:
-                content += f"- {strength}\n"
-            content += "\n"
-        
-        # Add improvements section
+            feedback_parts.append("**Strengths:**")
+            # Use unique strengths to avoid repetition
+            unique_strengths = list(dict.fromkeys(strengths))
+            for strength in unique_strengths:
+                feedback_parts.append(f"- {strength}")
+            feedback_parts.append("\n") # Add a newline
+
+        # 3. Areas for Improvement Section (Limited to max 4 points)
         if improvements:
-            content += "### Areas for Improvement\n"
-            for improvement in improvements:
-                content += f"- {improvement}\n"
-            content += "\n"
-        
-        # Add metrics summary
-        content += "### Evaluation Metrics\n"
-        content += f"- Technical Accuracy: {metrics.technical_accuracy:.2f}\n"
-        content += f"- Completeness: {metrics.completeness:.2f}\n"
-        content += f"- Clarity: {metrics.clarity:.2f}\n"
-        content += f"- Relevance: {metrics.relevance:.2f}\n"
-        content += f"- Overall Score: {metrics.overall_score:.2f}\n\n"
-        
-        # Add role-specific advice if available
-        if hasattr(question, "role") and question.role:
-            content += f"### Role-Specific Advice for {question.role}\n"
-            content += f"For the {question.role} role, it's particularly important to demonstrate strong skills in "
+            feedback_parts.append("**Areas for Improvement:**")
+            # Use unique improvements to avoid repetition
+            unique_improvements = list(dict.fromkeys(improvements))
             
-            if hasattr(question, "expected_skills") and question.expected_skills:
-                skills = ", ".join(question.expected_skills)
-                content += f"{skills}. "
-            else:
-                content += "technical knowledge, problem-solving, and communication. "
-            
-            content += "Focus on these areas in your interview preparation.\n"
-        
-        return content
+            # Limit to a maximum of 4 improvement points
+            improvement_count = 0
+            for improvement in unique_improvements:
+                if improvement_count < 4:
+                    # Combine descriptive and actionable points directly
+                    feedback_parts.append(f"- {improvement}")
+                    improvement_count += 1
+                else:
+                    break # Stop adding points once the limit is reached
+
+
+        # Combine parts into final feedback string
+        final_feedback = "\n".join(feedback_parts).strip() # Use newline as separator
+
+        # Fallback if no specific strengths/improvements were generated but score isn't perfect
+        if not strengths and not improvements and metrics.overall_score < 0.95:
+             final_feedback += "\n\nConsider reviewing the core concepts and requirements related to the question to further refine your response."
+
+
+        return final_feedback

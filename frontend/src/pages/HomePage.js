@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
+// import CardActions from '@mui/material/CardActions'; // Removed unused import
 import WorkIcon from '@mui/icons-material/Work';
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver';
 import FeedbackIcon from '@mui/icons-material/Feedback';
@@ -61,11 +61,11 @@ const HomePage = () => {
                 interview questions specific to your career path.
               </Typography>
             </CardContent>
-            <CardActions>
+            {/* <CardActions>
               <Button size="small" color="primary">
                 Browse Roles
               </Button>
-            </CardActions>
+            </CardActions> */}
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
@@ -80,11 +80,11 @@ const HomePage = () => {
                 for evaluation, just like in a real interview setting.
               </Typography>
             </CardContent>
-            <CardActions>
+            {/* <CardActions>
               <Button size="small" color="primary">
                 Learn More
               </Button>
-            </CardActions>
+            </CardActions> */}
           </Card>
         </Grid>
         <Grid item xs={12} md={4}>
@@ -99,11 +99,11 @@ const HomePage = () => {
                 of your answers, with specific suggestions for improvement.
               </Typography>
             </CardContent>
-            <CardActions>
+            {/* <CardActions>
               <Button size="small" color="primary">
                 View Sample
               </Button>
-            </CardActions>
+            </CardActions> */}
           </Card>
         </Grid>
       </Grid>
