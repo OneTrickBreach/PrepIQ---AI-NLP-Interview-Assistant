@@ -81,6 +81,8 @@ def load_sample_data(data_dir, sample_size=5):
                 # Load answer
                 with open(answer_path, 'r', encoding='utf-8') as f:
                     answer_data = json.load(f)
+                    # Remove unexpected keys before creating the Answer object
+                    answer_data.pop('in_test_set', None)
                     answer = Answer(**answer_data)
                 
                 # Load metrics if available
