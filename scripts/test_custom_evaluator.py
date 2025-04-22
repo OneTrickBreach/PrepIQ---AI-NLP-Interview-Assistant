@@ -164,32 +164,71 @@ def test_model(model, samples):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test custom evaluator model")
-    
-    parser.add_argument("--data_dir", type=str, default="organized_data", help="Directory containing the organized data")
-    parser.add_argument("--sample_size", type=int, default=5, help="Number of samples to test")
-    
+
+    parser.add_argument("--input_file", type=str, required=True, help="Path to the input JSON file (without predicted metrics)")
+    parser.add_argument("--output_file", type=str, required=True, help="Path to the output JSON file (with predicted metrics)")
+
     args = parser.parse_args()
     
     try:
-        # Load sample data
-        samples = load_sample_data(args.data_dir, args.sample_size)
-        
+        # Load data from input file
+        logger.info(f"Loading data from {args.input_file}")
+        with open(args.input_file, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+
         # Create model
         logger.info("Creating model")
         model = CustomEvaluatorModel()
-        
-        # Test model
-        results = test_model(model, samples)
-        
-        # Save results
-        results_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results")
-        os.makedirs(results_dir, exist_ok=True)
-        
-        results_path = os.path.join(results_dir, "custom_evaluator_test_results.json")
-        with open(results_path, 'w', encoding='utf-8') as f:
+
+        # Evaluate data and add predicted metrics
+        results = []
+        for item in tqdm(data):
+            question_content = item["question"]
+            answer_content = item["answer"]
+
+            # Create dummy Question and Answer objects
+            class DummyQuestion:
+                def __init__(self, content):
+                    self.content = content
+                    self.role = "Software Engineer"  # Placeholder
+                    self.difficulty = "Medium"  # Placeholder
+
+            class DummyAnswer:
+                def __init__(self, content):
+                    self.content = content
+
+            question = DummyQuestion(question_content)
+            answer = DummyAnswer(answer_content)
+
+            # Get model predictions
+            predicted_metrics = model.evaluate_answer(question, answer)
+
+            # Store results
+            result = {
+                "question": question_content,
+                "answer": answer_content,
+                "predicted": {
+                    "technical_accuracy": predicted_metrics.technical_accuracy,
+                    "completeness": predicted_metrics.completeness,
+                    "clarity": predicted_metrics.clarity,
+                    "relevance": predicted_metrics.relevance,
+                    "overall_score": predicted_metrics.overall_score
+                }
+            }
+
+            # Add ground truth if available
+            if "ground_truth" in item:
+                result["ground_truth"] = item["ground_truth"]
+
+            results.append(result)
+
+        # Save results to output file
+        logger.info(f"Saving results to {args.output_file}")
+        with open(args.output_file, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2)
-        
-        logger.info(f"Results saved to {results_path}")
+
+        logger.info(f"Results saved to {args.output_file}")
+
     except Exception as e:
         logger.error(f"Error during testing: {str(e)}")
         import traceback
