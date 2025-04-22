@@ -1,13 +1,49 @@
 [
   {
     "question": "What are the key concepts in Python?",
+    "answer": "I DONT KNOW",
+    "predicted": {
+      "technical_accuracy": 0.013255937024950981,
+      "completeness": 0.009651871398091316,
+      "clarity": 0.027554070577025414,
+      "relevance": 0.013670818880200386,
+      "overall_score": 0.016033174470067024
+    },
+    "ground_truth": {
+      "technical_accuracy": 0.01,
+      "completeness": 0.0,
+      "clarity": 0.05,
+      "relevance": 0.0,
+      "overall_score": 0.01
+    }
+  },
+  {
+    "question": "What are the key concepts in Python?",
+    "answer": "My favorite color is blue.",
+    "predicted": {
+      "technical_accuracy": 0.010628847405314445,
+      "completeness": 0.008523867465555668,
+      "clarity": 0.026898140087723732,
+      "relevance": 0.011408514343202114,
+      "overall_score": 0.01436484232544899
+    },
+    "ground_truth": {
+      "technical_accuracy": 0.0,
+      "completeness": 0.0,
+      "clarity": 0.1,
+      "relevance": 0.0,
+      "overall_score": 0.01
+    }
+  },
+  {
+    "question": "What are the key concepts in Python?",
     "answer": "The key concept behind this is...\n\nTo implement this, you would...\n\nFor better performance, consider...\n\n",
     "predicted": {
-      "technical_accuracy": 0.4404821991920471,
-      "completeness": 0.4209616184234619,
-      "clarity": 0.4415518045425415,
-      "relevance": 0.3033832311630249,
-      "overall_score": 0.40159472823143005
+      "technical_accuracy": 0.8974495530128479,
+      "completeness": 0.8785565495491028,
+      "clarity": 0.9169886708259583,
+      "relevance": 0.8929782509803772,
+      "overall_score": 0.8964932560920715
     },
     "ground_truth": {
       "technical_accuracy": 0.95,
@@ -21,11 +57,11 @@
     "question": "What are the key concepts in Python?",
     "answer": "",
     "predicted": {
-      "technical_accuracy": 0.394438236951828,
-      "completeness": 0.4321848154067993,
-      "clarity": 0.4313962161540985,
-      "relevance": 0.36586254835128784,
-      "overall_score": 0.4059704542160034
+      "technical_accuracy": 0.3184364438056946,
+      "completeness": 0.4820821285247803,
+      "clarity": 0.4964146316051483,
+      "relevance": 0.5150127410888672,
+      "overall_score": 0.4529864862561226
     },
     "ground_truth": {
       "technical_accuracy": 0.32,
@@ -39,11 +75,11 @@
     "question": "What are the key concepts in Python?",
     "answer": "For better performance, consider...\n\n",
     "predicted": {
-      "technical_accuracy": 0.3805224597454071,
-      "completeness": 0.43438470363616943,
-      "clarity": 0.4473528265953064,
-      "relevance": 0.3804490268230438,
-      "overall_score": 0.4106772541999817
+      "technical_accuracy": 0.761670708656311,
+      "completeness": 0.6867282390594482,
+      "clarity": 0.6907687187194824,
+      "relevance": 0.7113434076309204,
+      "overall_score": 0.7126277685165405
     },
     "ground_truth": {
       "technical_accuracy": 0.74,
@@ -51,42 +87,6 @@
       "clarity": 0.65,
       "relevance": 0.71,
       "overall_score": 0.69
-    }
-  },
-  {
-    "question": "How do you optimize API Development for performance?",
-    "answer": "The key concept behind this is...\n\nTo implement this, you would...\n\nFor better performance, consider...\n\n",
-    "predicted": {
-      "technical_accuracy": 0.4714100658893585,
-      "completeness": 0.40561169385910034,
-      "clarity": 0.4259859025478363,
-      "relevance": 0.443096399307251,
-      "overall_score": 0.43652603030204773
-    },
-    "ground_truth": {
-      "technical_accuracy": 0.89,
-      "completeness": 0.84,
-      "clarity": 0.91,
-      "relevance": 0.82,
-      "overall_score": 0.86
-    }
-  },
-  {
-    "question": "How do you optimize API Development for performance?",
-    "answer": "",
-    "predicted": {
-      "technical_accuracy": 0.4445645809173584,
-      "completeness": 0.39803212881088257,
-      "clarity": 0.40063753724098206,
-      "relevance": 0.5251160860061646,
-      "overall_score": 0.4420875906944275
-    },
-    "ground_truth": {
-      "technical_accuracy": 0.5,
-      "completeness": 0.52,
-      "clarity": 0.51,
-      "relevance": 0.32,
-      "overall_score": 0.46
     }
   }
 ]
