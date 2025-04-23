@@ -203,3 +203,19 @@ python scripts/train_custom_evaluator.py --data_dir organized_data/ --output_dir
 - Speech-to-text is now handled locally using Whisper. Performance depends on your hardware and the chosen Whisper model size (default is "base").
 
 ---
+
+## Demo
+
+A `demo.py` file is included to quickly start the backend and frontend and open the landing page. To use the demo, ensure that your Python virtual environment is active and that you have installed the Node.js dependencies for the frontend.
+
+To run the demo, execute the following command:
+
+```bash
+python demo.py
+```
+
+This will start the backend and frontend in separate terminals and open the landing page in your web browser.
+
+**Important:** Make sure your environment is active before running the demo.
+
+---
