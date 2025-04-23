@@ -69,7 +69,7 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 
 Before you begin, ensure you have the following installed on your system:
 
-1.  **Python:** Version 3.8 or higher.
+1.  **Python:** Version 3.9 or higher **AND** 3.11 or lower.
 2.  **Git:** For cloning the repository.
 3.  **Node.js and npm:** Required for the frontend application. Download from [https://nodejs.org/](https://nodejs.org/).
 4.  **FFmpeg:** Required by the Whisper library for audio processing.
@@ -95,9 +95,7 @@ cd PrepIQ---AI-NLP-Interview-Assistant
 
   # Activate the environment (do this every time you work on the project)
   # Windows (PowerShell):
-  .\.venv\Scripts\Activate.ps1
-  # Windows (Command Prompt):
-  # .\.venv\Scripts\activate.bat
+  .venv\Scripts\activate
   # macOS/Linux:
   # source .venv/bin/activate 
   ```
@@ -139,19 +137,7 @@ The custom-trained evaluation model (`.pt` file) is required for the answer eval
   cd .. 
   ```
 
-### 5. Generating Sample Data (Optional)
-
-If you want to generate synthetic sample data for testing or retraining:
-
-```bash
-# Ensure your Python virtual environment is active
-python scripts/generate_dataset.py
-python scripts/organize_data.py
-```
-
-> **Note:** This synthetic data is very basic. For real training, replace or augment it with real, annotated examples.
-
-### 6. Running the Application
+### 5. Running the Application
 
 You need to run the backend and frontend servers simultaneously in separate terminals.
 
@@ -177,6 +163,20 @@ You need to run the backend and frontend servers simultaneously in separate term
 
 ---
 
+## Generating Sample Data (Optional)
+
+If you want to generate synthetic sample data for testing or retraining:
+
+```bash
+# Ensure your Python virtual environment is active
+python scripts/generate_dataset.py
+python scripts/organize_data.py
+```
+
+> **Note:** This synthetic data is very basic. For real training, replace or augment it with real, annotated examples.
+
+---
+
 ## Training the Evaluation Model (Optional)
 
 - To train from scratch:
@@ -195,15 +195,6 @@ python scripts/train_custom_evaluator.py --data_dir organized_data/ --output_dir
 
 ---
 
-## Notes
-
-- The `.gitignore` excludes large data/model directories and environment files.
-- Placeholder files are included in excluded directories to preserve structure.
-- You can customize roles, questions, and feedback templates by editing the data files or generation scripts.
-- Speech-to-text is now handled locally using Whisper. Performance depends on your hardware and the chosen Whisper model size (default is "base").
-
----
-
 ## Demo
 
 A `demo.py` file is included to quickly start the backend and frontend and open the landing page. To use the demo, ensure that your Python virtual environment is active and that you have installed the Node.js dependencies for the frontend.
@@ -214,8 +205,15 @@ To run the demo, execute the following command:
 python demo.py
 ```
 
-This will start the backend and frontend in separate terminals and open the landing page in your web browser.
-
 **Important:** Make sure your environment is active before running the demo.
+
+---
+
+## Notes
+
+- The `.gitignore` excludes large data/model directories and environment files.
+- Placeholder files are included in excluded directories to preserve structure.
+- You can customize roles, questions, and feedback templates by editing the data files or generation scripts.
+- Speech-to-text is now handled locally using Whisper. Performance depends on your hardware and the chosen Whisper model size (default is "base").
 
 ---
