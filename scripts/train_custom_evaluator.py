@@ -23,7 +23,6 @@ sys.path.append(project_root)
 
 from src.models.custom_evaluator import CustomEvaluator
 from src.schemas import Question, Answer, EvaluationMetrics
-# from src.training.dataset import InterviewDataset # This seems unused
 
 # Configure logging
 logging.basicConfig(
@@ -54,13 +53,11 @@ class EvaluatorDataset(Dataset):
         Includes general category answers.
         """
         logger.info(f"Loading data from directory: {data_dir}")
-        roles_dir = os.path.join(data_dir, "roles") # This seems unused, keeping for now
+        roles_dir = os.path.join(data_dir, "roles") 
         questions_base_dir = os.path.join(data_dir, "questions")
         answers_base_dir = os.path.join(data_dir, "answers")
 
-        # ... (rest of the existing checks for directories) ...
-
-        all_questions = {} # Store all questions from all roles
+        all_questions = {} 
 
         processed_roles = 0
         for role_dir in os.listdir(questions_base_dir):
@@ -150,7 +147,7 @@ class EvaluatorDataset(Dataset):
                                 answer = Answer(**answer_data)
 
                                 # Pair general answers with multiple random questions
-                                num_pairings = 5 # Pair each general answer with 5 random questions
+                                num_pairings = 5 
                                 random_question_ids = random.sample(list(all_questions.keys()), min(num_pairings, len(all_questions)))
 
                                 for q_id in random_question_ids:
@@ -159,12 +156,12 @@ class EvaluatorDataset(Dataset):
                                     low_metrics = EvaluationMetrics(
                                         technical_accuracy=0.1,
                                         completeness=0.1,
-                                        clarity=0.5, # Clarity might be okay for "IDK"
+                                        clarity=0.5, 
                                         relevance=0.0
                                     )
                                     # Adjust metrics based on category if needed
                                     if category == "Relevant but incorrect":
-                                         low_metrics.relevance = 0.6 # Slightly higher relevance
+                                         low_metrics.relevance = 0.6 
                                          low_metrics.technical_accuracy = 0.0
                                     elif category == "IDK":
                                          low_metrics.completeness = 0.0
@@ -172,7 +169,7 @@ class EvaluatorDataset(Dataset):
                                     self.examples.append({
                                         "question": question,
                                         "answer": answer,
-                                        "metrics": low_metrics # Use predefined low metrics
+                                        "metrics": low_metrics 
                                     })
                             except Exception as e:
                                 logger.error(f"Error loading or pairing general answer {answer_filepath}: {str(e)}")
@@ -180,9 +177,9 @@ class EvaluatorDataset(Dataset):
              logger.warning("No role-specific questions loaded, cannot pair general answers.")
         else:
             logger.warning("General answers directory not found or empty.")
-        # --- End: Load General Answers ---
+        
 
-        if processed_roles == 0 and not self.examples: # Check if any examples were loaded at all
+        if processed_roles == 0 and not self.examples: 
              logger.error("No roles processed and no general answers loaded. Check data directory structure and content.")
         logger.info(f"Loaded {len(self.examples)} total evaluation examples.")
     
@@ -302,7 +299,6 @@ def train_evaluator(args):
     
     # Move model to device AFTER potentially loading weights
     model.to(device)
-    # ------------------------------------
 
     # Define loss function and optimizer
     criterion = nn.MSELoss()
@@ -311,9 +307,6 @@ def train_evaluator(args):
     # Training loop
     best_val_loss = float('inf')
     best_model_path = None
-    
-    # Load best_val_loss if resuming (optional, simple approach just loads weights)
-    # If optimizer state were saved, load it here too.
     
     for epoch in range(args.num_epochs):
         logger.info(f"Starting epoch {epoch+1}/{args.num_epochs}")
@@ -379,7 +372,6 @@ def train_evaluator(args):
                 best_val_loss = avg_val_loss
                 os.makedirs(args.output_dir, exist_ok=True)
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                # Save with a consistent name for 'best' and maybe epoch-specific checkpoints
                 current_best_model_path = os.path.join(args.output_dir, f"custom_evaluator_best.pt") 
                 torch.save(model.state_dict(), current_best_model_path)
                 best_model_path = current_best_model_path 
@@ -400,7 +392,6 @@ def train_evaluator(args):
             try:
                 torch.save(model.state_dict(), periodic_save_path)
                 logger.info(f"Periodic save after epoch {epoch+1} to {periodic_save_path}")
-                # Update best_model_path if this is the most recent save
                 best_model_path = periodic_save_path
             except Exception as e:
                  logger.error(f"Failed periodic save after epoch {epoch+1}: {e}")

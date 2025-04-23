@@ -145,13 +145,11 @@ class FeedbackGenerator:
             }
         }
         
-        # Load components from file if it exists
         components_file = os.path.join(self.templates_dir, "components.json")
         if os.path.exists(components_file):
             with open(components_file, 'r', encoding='utf-8') as f:
                 components = json.load(f)
         else:
-            # Use default components
             components["technical_accuracy"]["high"] = [
                 {"text": "Your answer demonstrates excellent technical accuracy.", "suggestion": None},
                 {"text": "You've shown a deep understanding of the technical concepts.", "suggestion": None}

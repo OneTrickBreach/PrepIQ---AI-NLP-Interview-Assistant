@@ -84,7 +84,7 @@ class TransformerModel(BaseModel):
             id=f"a_{question.id}",
             question_id=question.id,
             content=answer_text,
-            confidence=0.9,  # Initial confidence score
+            confidence=0.9,  
             created_at=datetime.utcnow()
         )
         
@@ -134,7 +134,6 @@ class TransformerModel(BaseModel):
             metrics = json.loads(metrics_text)
             return metrics
         except json.JSONDecodeError:
-            # Fallback to default metrics if parsing fails
             return {
                 "technical_accuracy": 0.5,
                 "completeness": 0.5,
@@ -199,7 +198,6 @@ class TransformerModel(BaseModel):
                 created_at=datetime.utcnow()
             )
         except json.JSONDecodeError:
-            # Fallback to default feedback if parsing fails
             return Feedback(
                 id=f"f_{answer.id}",
                 answer_id=answer.id,

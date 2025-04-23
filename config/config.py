@@ -51,10 +51,8 @@ class Settings(BaseSettings):
         env_file = ".env"
         env_file_encoding = "utf-8"
 
-# Create settings instance
 settings = Settings()
 
-# Example usage
 def main():
     print(f"Project Name: {settings.PROJECT_NAME}")
     print(f"Version: {settings.VERSION}")

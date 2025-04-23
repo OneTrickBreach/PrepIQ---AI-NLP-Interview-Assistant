@@ -54,7 +54,6 @@ class InterviewPipeline:
         if evaluator_type == "custom":
             self.evaluator = CustomEvaluatorModel(model_path=evaluator_path)
         elif evaluator_type == "baseline":
-            # Use the same model for evaluation
             self.evaluator = self.model
         else:
             raise ValueError(f"Unknown evaluator type: {evaluator_type}")
@@ -86,7 +85,6 @@ class InterviewPipeline:
         
         logger.info(f"Processing audio input from {audio_path}")
         
-        # Convert audio to text
         text = self.speech_to_text.transcribe(audio_path)
         
         logger.info(f"Audio transcribed to text: {text[:50]}...")
@@ -107,8 +105,6 @@ class InterviewPipeline:
         """
         logger.info(f"Generating {difficulty} {question_type} question for {role}")
         
-        # This would typically call a question generator component
-        # For now, we'll use a basic placeholder implementation
         
         # Generate a unique ID
         question_id = f"q_{role.replace(' ', '_')}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
@@ -119,7 +115,6 @@ class InterviewPipeline:
             expected_skills = ["Algorithms", "Data Structures", "Problem Solving"]
         elif role.lower() == "data scientist":
             expected_skills = ["Machine Learning", "Statistics", "Data Analysis"]
-        # Add more roles as needed
         
         # Generate question content
         if question_type.lower() == "technical":

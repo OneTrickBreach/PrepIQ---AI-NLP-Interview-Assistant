@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ApiClient from '../api/client'; // Import the API client
+import ApiClient from '../api/client';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
@@ -42,12 +42,10 @@ const InterviewPage = () => {
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   
-  // Load available roles on component mount
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         setLoading(true);
-        // For demo, use hardcoded roles
         setRoles([
           'Software Engineer',
           'Data Scientist',
@@ -73,31 +71,24 @@ const InterviewPage = () => {
     fetchRoles();
   }, []);
   
-  // Handle role selection
   const handleRoleChange = (event) => {
     setSelectedRole(event.target.value);
   };
   
-  // Handle question type selection
   const handleTypeChange = (event) => {
     setQuestionType(event.target.value);
   };
   
-  // Handle difficulty selection
   const handleDifficultyChange = (event) => {
     setDifficulty(event.target.value);
   };
   
-  // Handle getting a question
   const handleGetQuestion = async () => {
     try {
       setLoading(true);
       setError(null);
-      // Call backend API to get a question
       const questionData = await ApiClient.generateQuestion(selectedRole, difficulty, questionType);
-      // Assuming the API returns an object like { id, role, type, difficulty, content, expected_skills, created_at }
       setQuestion(questionData);
-      // Removed stray }); here
       setLoading(false);
       setActiveStep(1);
     } catch (err) {
@@ -106,7 +97,6 @@ const InterviewPage = () => {
     }
   };
   
-  // Handle starting recording
   const handleStartRecording = async () => {
     setError(null);
     try {
@@ -135,7 +125,6 @@ const InterviewPage = () => {
     }
   };
   
-  // Handle stopping recording
   const handleStopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
@@ -143,7 +132,6 @@ const InterviewPage = () => {
     }
   };
   
-  // Handle text-to-speech for the question
   const handleSpeakQuestion = () => {
     if ('speechSynthesis' in window && question) {
       const utterance = new SpeechSynthesisUtterance(question.content);
@@ -153,32 +141,27 @@ const InterviewPage = () => {
     }
   };
   
-  // Handle submitting the answer
   const handleSubmitAnswer = async () => {
     try {
       setLoading(true);
       setError(null);
-      let answerText = answer; // Start with typed answer
+      let answerText = answer; 
 
       // If audio exists, transcribe it and use it as the answer
       if (audioBlob) {
         try {
           const transcript = await ApiClient.transcribeAudio(audioBlob);
-          answerText = transcript; // Use transcript as the answer
-          // Optionally update the 'answer' state if needed elsewhere
-          // setAnswer(transcript);
+          answerText = transcript; 
         } catch (transcriptionError) {
            console.error("Transcription Error:", transcriptionError);
            setError(`Failed to transcribe audio: ${transcriptionError.message}. Using typed answer if available.`);
-           // Fallback to typed answer if transcription fails but text exists
            if (!answerText) {
                 setLoading(false);
-                return; // Stop if transcription failed and no typed answer
+                return; 
            }
         }
       }
       
-      // Ensure we have an answer (either typed or transcribed)
       if (!question || !answerText) {
           setError("Missing question or answer.");
           setLoading(false);
@@ -195,35 +178,30 @@ const InterviewPage = () => {
 
       // 2. Generate Feedback using metrics
       const feedbackResponse = await ApiClient.generateFeedback(question.content, answerText, metrics);
-       if (!feedbackResponse || !feedbackResponse.feedback) {
+      if (!feedbackResponse || !feedbackResponse.feedback) {
           throw new Error("Failed to get feedback content from backend.");
       }
       
-      // Assuming feedbackResponse.feedback contains the structure needed by ResultsPage
-      // e.g., { content: "...", metrics: { ... } }
       const finalFeedback = feedbackResponse.feedback;
       
-      // Ensure metrics are included if not nested under feedback.feedback
       if (!finalFeedback.metrics) {
           finalFeedback.metrics = metrics;
       }
 
       setFeedback(finalFeedback);
       setLoading(false);
-      setActiveStep(3); // Move to feedback display step within this component first
+      setActiveStep(3); 
 
       // 3. Navigate to Results Page after feedback is set
-      // Note: We might display feedback directly here (step 3) before a final results page,
-      // but following the original flow to navigate.
        navigate('/results', {
         state: {
           question,
           answer: {
-            id: `a_${question.id || 'temp'}`, // Use question ID if available
+            id: `a_${question.id || 'temp'}`, 
             content: answerText,
             audio_url: audioUrl
           },
-          feedback: finalFeedback // Pass the actual feedback
+          feedback: finalFeedback 
         }
       });
 
@@ -256,12 +234,10 @@ const InterviewPage = () => {
     }
   };
   
-  // Handle going back to the previous step
   const handleBack = () => {
     setActiveStep((prevStep) => prevStep - 1);
   };
   
-  // Helper function to get random question for demo
   const getRandomQuestion = (role, type) => {
     const technicalQuestions = {
       'Software Engineer': [
@@ -296,7 +272,6 @@ const InterviewPage = () => {
     return questions[Math.floor(Math.random() * questions.length)];
   };
   
-  // Helper function to get random skills for demo
   const getRandomSkills = (role) => {
     const skillsByRole = {
       'Software Engineer': ['Algorithms', 'Data Structures', 'Problem Solving', 'OOP', 'System Design'],
@@ -305,10 +280,9 @@ const InterviewPage = () => {
     };
     
     const skills = skillsByRole[role] || skillsByRole['Default'];
-    return skills.slice(0, 3); // Return first 3 skills
+    return skills.slice(0, 3); 
   };
   
-  // Helper function to generate mock feedback
   const generateMockFeedback = (question, answerText) => {
     return `## Feedback on your answer to: '${question.content}'
 

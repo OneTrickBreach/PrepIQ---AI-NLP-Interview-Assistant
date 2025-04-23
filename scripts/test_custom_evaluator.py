@@ -44,18 +44,16 @@ def load_sample_data(data_dir, sample_size=5):
     
     # Get a few roles
     roles = []
-    for role_file in os.listdir(roles_dir)[:3]:  # Limit to 3 roles
+    for role_file in os.listdir(roles_dir)[:3]:  
         if role_file.endswith(".json"):
             role = role_file.replace(".json", "")
             roles.append(role)
     
-    # For each role, get some questions and answers
     for role in roles:
         questions_dir = os.path.join(data_dir, "questions", role)
         if not os.path.exists(questions_dir):
             continue
             
-        # Get a few questions
         question_files = os.listdir(questions_dir)[:min(3, len(os.listdir(questions_dir)))]
         
         for question_file in question_files:
@@ -64,14 +62,12 @@ def load_sample_data(data_dir, sample_size=5):
                 question_data = json.load(f)
                 question = Question(**question_data)
             
-            # Get answers for this question
             question_id = question_file.replace(".json", "")
             answers_dir = os.path.join(data_dir, "answers", role, question_id)
             
             if not os.path.exists(answers_dir):
                 continue
                 
-            # Get answer files (not metrics files)
             answer_files = [f for f in os.listdir(answers_dir) if f.endswith(".json") and not f.endswith("_metrics.json")]
             
             for answer_file in answer_files:
@@ -81,7 +77,6 @@ def load_sample_data(data_dir, sample_size=5):
                 # Load answer
                 with open(answer_path, 'r', encoding='utf-8') as f:
                     answer_data = json.load(f)
-                    # Remove unexpected keys before creating the Answer object
                     answer_data.pop('in_test_set', None)
                     answer = Answer(**answer_data)
                 
@@ -94,15 +89,12 @@ def load_sample_data(data_dir, sample_size=5):
                 
                 samples.append((question, answer, metrics))
                 
-                # Stop if we have enough samples
                 if len(samples) >= sample_size:
                     break
             
-            # Stop if we have enough samples
             if len(samples) >= sample_size:
                 break
         
-        # Stop if we have enough samples
         if len(samples) >= sample_size:
             break
     
@@ -122,10 +114,8 @@ def test_model(model, samples):
     results = []
     
     for question, answer, ground_truth in tqdm(samples):
-        # Get model predictions
         predicted_metrics = model.evaluate_answer(question, answer)
         
-        # Store results
         result = {
             "question": question.content,
             "answer": answer.content,
@@ -138,7 +128,6 @@ def test_model(model, samples):
             }
         }
         
-        # Add ground truth if available
         if ground_truth:
             result["ground_truth"] = {
                 "technical_accuracy": ground_truth.technical_accuracy,
@@ -150,9 +139,8 @@ def test_model(model, samples):
         
         results.append(result)
     
-    # Print sample results
     print("\nSample results:")
-    for i, result in enumerate(results[:3]):  # Show first 3 results
+    for i, result in enumerate(results[:3]):  
         print(f"\nSample {i+1}:")
         print(f"Question: {result['question']}")
         print(f"Answer: {result['answer'][:100]}...")
@@ -171,27 +159,23 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     try:
-        # Load data from input file
         logger.info(f"Loading data from {args.input_file}")
         with open(args.input_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
 
-        # Create model
         logger.info("Creating model")
         model = CustomEvaluatorModel()
 
-        # Evaluate data and add predicted metrics
         results = []
         for item in tqdm(data):
             question_content = item["question"]
             answer_content = item["answer"]
 
-            # Create dummy Question and Answer objects
             class DummyQuestion:
                 def __init__(self, content):
                     self.content = content
-                    self.role = "Software Engineer"  # Placeholder
-                    self.difficulty = "Medium"  # Placeholder
+                    self.role = "Software Engineer"  
+                    self.difficulty = "Medium"  
 
             class DummyAnswer:
                 def __init__(self, content):
@@ -200,10 +184,8 @@ if __name__ == "__main__":
             question = DummyQuestion(question_content)
             answer = DummyAnswer(answer_content)
 
-            # Get model predictions
             predicted_metrics = model.evaluate_answer(question, answer)
 
-            # Store results
             result = {
                 "question": question_content,
                 "answer": answer_content,
@@ -216,13 +198,11 @@ if __name__ == "__main__":
                 }
             }
 
-            # Add ground truth if available
             if "ground_truth" in item:
                 result["ground_truth"] = item["ground_truth"]
 
             results.append(result)
 
-        # Save results to output file
         logger.info(f"Saving results to {args.output_file}")
         with open(args.output_file, 'w', encoding='utf-8') as f:
             json.dump(results, f, indent=2)

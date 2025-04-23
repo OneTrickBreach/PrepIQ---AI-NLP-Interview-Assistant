@@ -21,12 +21,10 @@ class SpeechToText:
         try:
             logger.info(f"Loading Whisper model: {model_size}")
             # Load the specified Whisper model
-            # This might download the model on first run
             self.model = whisper.load_model(model_size)
             logger.info(f"Whisper model '{model_size}' loaded successfully.")
         except Exception as e:
             logger.exception(f"Failed to load Whisper model '{model_size}'. Ensure ffmpeg is installed and model exists.")
-            # Raise a more specific error or handle appropriately
             raise RuntimeError(f"Could not initialize Whisper model '{model_size}'") from e
 
     def transcribe_audio(self, audio_content: bytes) -> Optional[str]:
@@ -39,11 +37,6 @@ class SpeechToText:
         Returns:
             The transcribed text or None if transcription fails.
         """
-        # Whisper works with file paths. We need to save the bytes to a temporary file.
-        # Use a temporary file that is deleted automatically upon closing.
-        # Suffix is important for Whisper to recognize the file type (e.g., .wav, .mp3, .opus)
-        # We assume the input bytes are in a format Whisper/ffmpeg can handle.
-        # If the original format was webm/opus, we can use .opus suffix.
         try:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".opus") as temp_audio_file:
                 temp_audio_file.write(audio_content)
@@ -51,10 +44,7 @@ class SpeechToText:
             
             logger.info(f"Transcribing temporary audio file: {temp_file_path}")
 
-            # Perform transcription
-            # You can add parameters like language="en" if needed, 
-            # but Whisper auto-detects language by default.
-            result = self.model.transcribe(temp_file_path, fp16=False) # fp16=False for CPU compatibility
+            result = self.model.transcribe(temp_file_path, fp16=False) 
 
             transcript = result.get("text")
 
@@ -63,14 +53,13 @@ class SpeechToText:
                  return None
 
             final_transcript = transcript.strip()
-            logger.info(f"Transcription result: {final_transcript[:100]}...") # Log snippet
+            logger.info(f"Transcription result: {final_transcript[:100]}...")
             return final_transcript
 
         except Exception as e:
             logger.exception(f"Error during Whisper transcription process: {e}")
             return None
         finally:
-            # Ensure the temporary file is deleted if it still exists
             if 'temp_file_path' in locals() and os.path.exists(temp_file_path):
                 try:
                     os.remove(temp_file_path)
@@ -81,7 +70,6 @@ class SpeechToText:
 
 # Example usage (updated for Whisper)
 def main():
-    # Initialize with a model size (e.g., "base")
     stt = SpeechToText(model_size="base") 
     
     # Example audio content (replace with actual audio bytes from a file)
@@ -103,7 +91,4 @@ def main():
         print("Transcription failed.")
 
 if __name__ == "__main__":
-    # Note: Running this main() requires a valid audio file's bytes 
-    #       and will download the Whisper model if not already cached.
-    # main() # Commented out by default to avoid running dummy example automatically
     print("SpeechToText class defined. To test, uncomment main() and provide real audio bytes.")

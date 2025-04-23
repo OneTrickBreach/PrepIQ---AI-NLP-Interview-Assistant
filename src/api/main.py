@@ -40,7 +40,7 @@ app.add_middleware(
 pipeline = InterviewPipeline(
     model_type="transformer",
     evaluator_type="custom",
-    use_speech_to_text=False  # Set to True if speech-to-text functionality is implemented
+    use_speech_to_text=False  
 )
 
 # API Input/Output Models
@@ -118,8 +118,6 @@ async def generate_answer(request: AnswerRequest):
         Answer: The generated answer
     """
     try:
-        # Find question by ID (this would typically use a database)
-        # For now, just create a dummy question object
         question = Question(
             id=request.question_id,
             role="General",

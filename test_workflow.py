@@ -8,7 +8,6 @@ import sys
 import logging
 from datetime import datetime
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -18,7 +17,6 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Import components
 from src.schemas import Question, Answer, EvaluationMetrics
 from src.models.transformer import TransformerModel
 from src.models.custom_evaluator import CustomEvaluatorModel
@@ -30,7 +28,6 @@ def test_end_to_end():
     try:
         logger.info("Starting end-to-end workflow test")
         
-        # Initialize the pipeline
         logger.info("Initializing interview pipeline")
         pipeline = InterviewPipeline(
             model_type="transformer",
@@ -45,7 +42,7 @@ def test_end_to_end():
         assert len(roles) > 0, "No roles returned"
         
         # 2. Test question generation
-        role = roles[0]  # Use the first role
+        role = roles[0]  
         logger.info(f"Testing question generation for role: {role}")
         question = pipeline.generate_question(
             role=role,
