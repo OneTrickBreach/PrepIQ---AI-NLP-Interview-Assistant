@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Create base axios instance
 const api = axios.create({
-  baseURL: '/api', // This will use the proxy setup in package.json
-  timeout: 30000, // 30 seconds timeout
+  baseURL: '/api', 
+  timeout: 30000, 
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -12,7 +12,6 @@ const api = axios.create({
 
 // API functions
 export const ApiClient = {
-  // Get list of available roles
   getRoles: async () => {
     try {
       const response = await api.get('/roles');
@@ -26,8 +25,6 @@ export const ApiClient = {
   // Generate an interview question
   generateQuestion: async (role, difficulty = 'medium', type = 'technical') => {
     try {
-      // Corrected endpoint path
-      // Removed explicit /api prefix, baseURL handles it
       const response = await api.post('/questions', {
         role,
         difficulty,
@@ -55,11 +52,8 @@ export const ApiClient = {
   },
   
   // Evaluate an answer
-  // Added expected_skills parameter
   evaluateAnswer: async (question, answer, expected_skills) => {
     try {
-      // Corrected endpoint path and added expected_skills to payload
-      // Removed explicit /api prefix, baseURL handles it
       const response = await api.post('/evaluate', {
         question,
         answer,
@@ -75,8 +69,6 @@ export const ApiClient = {
   // Generate feedback for an answer
   generateFeedback: async (question, answer, metrics) => {
     try {
-      // Ensure endpoint path is correct
-      // Removed explicit /api prefix, baseURL handles it
       const response = await api.post('/generate-feedback', {
         question,
         answer,
@@ -108,17 +100,13 @@ export const ApiClient = {
   transcribeAudio: async (audioBlob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.readAsDataURL(audioBlob); // Reads blob as base64 data URL
+      reader.readAsDataURL(audioBlob); 
       reader.onloadend = async () => {
         try {
-          // Extract base64 data (remove prefix 'data:audio/wav;base64,')
           const base64Audio = reader.result.split(',')[1];
           
-          // Corrected endpoint path
-          // Removed explicit /api prefix, baseURL handles it
           const response = await api.post('/transcribe', {
             audio_content: base64Audio,
-            // domain: 'interview'
           });
           
           if (response.data && response.data.transcript) {
@@ -137,7 +125,6 @@ export const ApiClient = {
       };
     });
   }
-  // Removed old uploadAudio function
 };
 
 export default ApiClient;

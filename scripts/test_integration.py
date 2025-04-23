@@ -33,7 +33,7 @@ def test_question_generation(pipeline: InterviewPipeline):
     roles = pipeline.get_available_roles()
     logger.info(f"Testing question generation for {len(roles)} roles")
     
-    for role in roles[:3]:  # Test first 3 roles
+    for role in roles[:3]:  
         for difficulty in ["easy", "medium", "hard"]:
             for question_type in ["technical", "behavioral"]:
                 logger.info(f"Generating {difficulty} {question_type} question for {role}")
@@ -52,7 +52,6 @@ def test_question_generation(pipeline: InterviewPipeline):
 
 def test_answer_generation(pipeline: InterviewPipeline):
     """Test answer generation for sample questions."""
-    # Create a sample question
     question = Question(
         id="q_test_1",
         role="Software Engineer",
@@ -104,7 +103,6 @@ def test_complete_pipeline(pipeline: InterviewPipeline):
     """Test the complete interview pipeline workflow."""
     logger.info("Testing complete interview pipeline")
     
-    # Create a sample question
     question = Question(
         id="q_test_complete",
         role="Data Scientist",
@@ -115,7 +113,6 @@ def test_complete_pipeline(pipeline: InterviewPipeline):
         created_at=datetime.utcnow()
     )
     
-    # Sample answer text
     answer_text = (
         "When handling missing data in a dataset, I typically follow a systematic approach. "
         "First, I assess the extent and pattern of missingness - whether it's missing completely at random (MCAR), "
@@ -151,7 +148,6 @@ def save_test_results(result, output_dir):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     
-    # Convert to dictionary for JSON serialization
     serialized_result = {
         "question": {
             "id": result["question"].id,
@@ -183,11 +179,9 @@ def save_test_results(result, output_dir):
         }
     }
     
-    # Save as JSON
     with open(output_dir / "test_results.json", "w", encoding="utf-8") as f:
         json.dump(serialized_result, f, indent=2)
     
-    # Save individual components as text files
     with open(output_dir / "question.txt", "w", encoding="utf-8") as f:
         f.write(result["question"].content)
     
@@ -220,7 +214,6 @@ def main():
             evaluator_type=args.evaluator_type
         )
         
-        # Run the tests
         test_question_generation(pipeline)
         
         question = Question(
@@ -237,10 +230,8 @@ def main():
         metrics = test_answer_evaluation(pipeline, question, answer)
         feedback = test_feedback_generation(pipeline, question, answer, metrics)
         
-        # Test complete pipeline
         result = test_complete_pipeline(pipeline)
         
-        # Save results
         save_test_results(result, args.output_dir)
         
         logger.info("All tests passed successfully!")

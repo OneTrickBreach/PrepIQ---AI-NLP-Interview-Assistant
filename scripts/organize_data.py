@@ -30,7 +30,7 @@ def organize_data(source_dir, target_dir):
     for file in files:
         if file.endswith("_job_desc.txt"):
             role = file.replace("_job_desc.txt", "")
-            role = role.replace("_", " ")  # Normalize role names
+            role = role.replace("_", " ")  
             roles.add(role)
             
             # Read job description
@@ -41,7 +41,7 @@ def organize_data(source_dir, target_dir):
             role_data = {
                 "name": role,
                 "description": job_desc,
-                "required_skills": [],  # You may need to extract these from the job description
+                "required_skills": [],  
                 "created_at": datetime.now().isoformat()
             }
             
@@ -61,11 +61,9 @@ def organize_data(source_dir, target_dir):
                 questions = json.load(f)
             
             for i, question in enumerate(questions):
-                # Ensure question has an ID
                 if "id" not in question:
                     question["id"] = f"q_{role.replace(' ', '_')}_{i+1}"
                 
-                # Write individual question file
                 question_path = os.path.join(questions_dir, f"{question['id']}.json")
                 with open(question_path, 'w', encoding='utf-8') as f:
                     json.dump(question, f, indent=2)
@@ -79,17 +77,14 @@ def organize_data(source_dir, target_dir):
                 answers = json.load(f)
             
             for answer in answers:
-                # Ensure answer has question_id and id
                 if "id" not in answer:
                     answer["id"] = f"a_{answer.get('question_id', 'unknown')}"
                 
                 if "question_id" in answer:
-                    # Create directory for answers to this question
                     question_id = answer["question_id"]
                     answer_dir = os.path.join(target_dir, "answers", role.replace(" ", "_"), question_id)
                     os.makedirs(answer_dir, exist_ok=True)
                     
-                    # Write answer file
                     answer_path = os.path.join(answer_dir, f"{answer['id']}.json")
                     with open(answer_path, 'w', encoding='utf-8') as f:
                         json.dump(answer, f, indent=2)
@@ -103,30 +98,24 @@ def organize_data(source_dir, target_dir):
                 feedbacks = json.load(f)
             
             for feedback in feedbacks:
-                # Ensure feedback has answer_id and id
                 if "id" not in feedback:
                     feedback["id"] = f"f_{feedback.get('answer_id', 'unknown')}"
                 
                 if "answer_id" in feedback and "metrics" in feedback:
-                    # Get question_id from answer_id (assuming answer_id is a_q_id)
                     answer_id = feedback["answer_id"]
                     parts = answer_id.split("_")
                     if len(parts) >= 3:
                         question_id = "_".join(parts[1:])
                         
-                        # Find the directory for this answer
                         answer_dir = os.path.join(target_dir, "answers", role.replace(" ", "_"), question_id)
                         if os.path.exists(answer_dir):
-                            # Write metrics file
                             metrics_path = os.path.join(answer_dir, f"{answer_id}_metrics.json")
                             with open(metrics_path, 'w', encoding='utf-8') as f:
                                 json.dump(feedback["metrics"], f, indent=2)
                             
-                            # Create feedback directory
                             feedback_dir = os.path.join(target_dir, "feedback", role.replace(" ", "_"), question_id)
                             os.makedirs(feedback_dir, exist_ok=True)
                             
-                            # Write feedback file
                             feedback_path = os.path.join(feedback_dir, f"{feedback['id']}.json")
                             with open(feedback_path, 'w', encoding='utf-8') as f:
                                 json.dump(feedback, f, indent=2)
@@ -140,7 +129,6 @@ if __name__ == "__main__":
         source_dir = sys.argv[1]
         target_dir = sys.argv[2]
     else:
-        # Default paths
         source_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
         target_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "organized_data")
     

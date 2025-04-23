@@ -32,7 +32,6 @@ def create_test_set(source_dir, test_dir, test_ratio=0.2):
             role = role_file.replace(".json", "")
             roles.append(role)
             
-            # Copy role file to test dir
             src_role_file = os.path.join(roles_dir, role_file)
             dst_role_file = os.path.join(test_dir, "roles", role_file)
             shutil.copy2(src_role_file, dst_role_file)
@@ -41,11 +40,9 @@ def create_test_set(source_dir, test_dir, test_ratio=0.2):
     
     # Process each role
     for role in roles:
-        # Create directories for this role
         os.makedirs(os.path.join(test_dir, "questions", role), exist_ok=True)
         os.makedirs(os.path.join(test_dir, "answers", role), exist_ok=True)
         
-        # Get all questions for this role
         questions_dir = os.path.join(source_dir, "questions", role)
         if not os.path.exists(questions_dir):
             print(f"No questions directory found for role: {role}")
@@ -53,9 +50,7 @@ def create_test_set(source_dir, test_dir, test_ratio=0.2):
             
         question_files = [f for f in os.listdir(questions_dir) if f.endswith(".json")]
         
-        # Randomly select questions for test set
         num_test_questions = max(1, int(len(question_files) * test_ratio))
-        # Make sure we don't try to sample more items than exist in the population
         num_test_questions = min(num_test_questions, len(question_files))
         test_question_files = random.sample(question_files, num_test_questions)
         
@@ -65,27 +60,22 @@ def create_test_set(source_dir, test_dir, test_ratio=0.2):
         for question_file in test_question_files:
             question_id = question_file.replace(".json", "")
             
-            # Copy question file to test dir
             src_question_file = os.path.join(questions_dir, question_file)
             dst_question_file = os.path.join(test_dir, "questions", role, question_file)
             shutil.copy2(src_question_file, dst_question_file)
             
-            # Check if this question has answers
             answers_dir = os.path.join(source_dir, "answers", role, question_id)
             if not os.path.exists(answers_dir):
                 print(f"No answers found for question: {question_id}")
                 continue
                 
-            # Create directory for answers to this question in test dir
             os.makedirs(os.path.join(test_dir, "answers", role, question_id), exist_ok=True)
             
-            # Copy all answers and metrics for this question
             for answer_file in os.listdir(answers_dir):
                 src_answer_file = os.path.join(answers_dir, answer_file)
                 dst_answer_file = os.path.join(test_dir, "answers", role, question_id, answer_file)
                 shutil.copy2(src_answer_file, dst_answer_file)
                 
-                # Mark as test set in source dir to avoid using it for training
                 if not answer_file.endswith("_metrics.json"):
                     with open(src_answer_file, 'r', encoding='utf-8') as f:
                         answer = json.load(f)

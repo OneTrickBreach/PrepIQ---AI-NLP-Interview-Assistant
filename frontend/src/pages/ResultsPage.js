@@ -16,7 +16,6 @@ import ReactMarkdown from 'react-markdown';
 import ReplayIcon from '@mui/icons-material/Replay';
 import SaveIcon from '@mui/icons-material/Save';
 import HomeIcon from '@mui/icons-material/Home';
-// import ShareIcon from '@mui/icons-material/Share'; // Removed ShareIcon import
 import Chip from '@mui/material/Chip';
 
 // Progress bar with label component
@@ -63,20 +62,17 @@ const getColorForScore = (score) => {
 const ResultsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const resultsRef = useRef(null); // Create a ref for the area to capture
+  const resultsRef = useRef(null); 
   
   // Get the question, answer, and feedback from location state
   const { question, answer, feedback } = location.state || {};
   
-  // Move useEffect outside the conditional
   useEffect(() => {
-    // Redirect to interview page if no data
     if (!question || !feedback) {
       navigate('/interview');
     }
   }, [navigate, question, feedback]);
   
-  // Return early if no data, after the useEffect
   if (!question || !feedback) {
     return null;
   }
@@ -96,25 +92,23 @@ const ResultsPage = () => {
     }
 
     console.log("Starting PDF generation...");
-    // Add a temporary class for styling during capture if needed
     input.classList.add('pdf-capture-active');
 
     html2canvas(input, {
-      scale: 2.5, // Slightly increased scale for potentially better multi-page quality
+      scale: 2.5, 
       useCORS: true,
-      logging: true, // Enable logging for debugging
-      // Attempt to capture full height even if scrollable
+      logging: true,
       windowHeight: input.scrollHeight,
-      scrollY: -window.scrollY // Account for page scroll position
+      scrollY: -window.scrollY
     })
     .then((canvas) => {
       console.log("Canvas generated, width:", canvas.width, "height:", canvas.height);
-      input.classList.remove('pdf-capture-active'); // Remove temporary class
+      input.classList.remove('pdf-capture-active');
       const imgData = canvas.toDataURL('image/png');
       
       // Use standard A4 size in points (pt)
       const pdf = new jsPDF({
-        orientation: 'p', // portrait
+        orientation: 'p',
         unit: 'pt',
         format: 'a4'
       });
@@ -152,13 +146,12 @@ const ResultsPage = () => {
 
     })
     .catch(err => {
-      input.classList.remove('pdf-capture-active'); // Ensure class is removed on error
+      input.classList.remove('pdf-capture-active'); 
       console.error("Error generating PDF:", err);
       alert("Failed to generate PDF. Check the console for details.");
     });
   };
   
-  // Removed handleShareResults function
   
   return (
     <Box sx={{ py: 4 }}>

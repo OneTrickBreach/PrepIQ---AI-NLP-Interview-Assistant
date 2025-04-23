@@ -19,7 +19,6 @@ class BaselineModel(BaseModel):
         
     def load_model(self) -> None:
         """Load the baseline model."""
-        # No model to load for baseline
         pass
         
     def generate_answer(self, question: Question, context: Optional[str] = None) -> Answer:
@@ -47,7 +46,7 @@ class BaselineModel(BaseModel):
             id=f"a_{question.id}",
             question_id=question.id,
             content=answer_text,
-            confidence=0.7,  # Baseline confidence score
+            confidence=0.7, 
             created_at=datetime.utcnow()
         )
         
@@ -62,7 +61,6 @@ class BaselineModel(BaseModel):
         Returns:
             Dict[str, float]: Evaluation metrics
         """
-        # Simple heuristic-based evaluation
         metrics = {
             "technical_accuracy": 0.6,
             "completeness": 0.7,
@@ -70,13 +68,11 @@ class BaselineModel(BaseModel):
             "relevance": 0.7
         }
         
-        # Adjust metrics based on question type
         if question.type == "technical":
             metrics["technical_accuracy"] *= 1.2
         elif question.type == "behavioral":
             metrics["clarity"] *= 1.2
             
-        # Normalize metrics
         for key in metrics:
             metrics[key] = min(1.0, max(0.0, metrics[key]))
             
@@ -93,7 +89,6 @@ class BaselineModel(BaseModel):
         Returns:
             Feedback: Generated feedback
         """
-        # Generate simple feedback based on question type
         if question.type == "technical":
             feedback = {
                 "strengths": [

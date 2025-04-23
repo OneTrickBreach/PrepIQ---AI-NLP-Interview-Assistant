@@ -1,22 +1,19 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box'; // Import Box
-import logo from '../assets/logo.png'; // Import the logo
+import Box from '@mui/material/Box'; 
+import logo from '../assets/logo.png'; 
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-// Removed duplicate Box import
 import { styled } from '@mui/material/styles';
 
-// Custom styled component for the logo
 const Logo = styled(Typography)(({ theme }) => ({
   fontWeight: 700,
   color: 'white',
   textDecoration: 'none',
 }));
 
-// Custom styled component for the navigation buttons
 const NavButton = styled(Button)(({ theme }) => ({
   color: 'white',
   marginLeft: theme.spacing(2),

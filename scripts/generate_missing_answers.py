@@ -37,14 +37,11 @@ GENERAL_ANSWERS = {
         "Zzzzzzzzzzzzzzzzzzzzz."
     ],
     "Relevant but incorrect": [
-        # These should ideally be generated based on actual questions,
-        # but for now, we'll use placeholders.
-        # You might need a more sophisticated generation for this category.
-        "To optimize Python, you should always use global variables.", # Incorrect technical
-        "The best way to handle that situation is to ignore the stakeholder.", # Incorrect behavioral
-        "React uses a real DOM, which makes it faster.", # Incorrect technical
-        "You prioritize the backlog based on alphabetical order.", # Incorrect process
-        "CloudFormation is primarily used for managing databases." # Incorrect technical
+        "To optimize Python, you should always use global variables.", 
+        "The best way to handle that situation is to ignore the stakeholder.",
+        "React uses a real DOM, which makes it faster.",
+        "You prioritize the backlog based on alphabetical order.",
+        "CloudFormation is primarily used for managing databases."
     ]
 }
 
@@ -59,20 +56,16 @@ def generate_general_answers(answers_base_dir: str):
         os.makedirs(category_path, exist_ok=True)
 
         for i, answer_content in enumerate(answer_list):
-            # Create a generic Answer object for these examples
-            # Note: These answers don't have a specific question_id
             answer_id = f"a_General_{category}_{i}"
             answer_filepath = os.path.join(category_path, f"{answer_id}.json")
 
             if not os.path.exists(answer_filepath):
                 logger.info(f"Generating general answer: {category} #{i}")
-                # We use dummy values for question_id and confidence here
-                # as these are general examples not tied to specific questions/evaluations yet.
                 answer = Answer(
                     id=answer_id,
-                    question_id="general_placeholder", # Placeholder ID
+                    question_id="general_placeholder", 
                     content=answer_content,
-                    confidence=0.0, # Confidence is not applicable here
+                    confidence=0.0, 
                     created_at=datetime.utcnow()
                 )
                 answer_data = {**asdict(answer), "created_at": answer.created_at.isoformat()}
@@ -100,7 +93,7 @@ def main():
     # Now process role-specific questions
     for role_dir in os.listdir(questions_base_dir):
         role_questions_path = os.path.join(questions_base_dir, role_dir)
-        role_answers_path = os.path.join(answers_base_dir, role_dir) # Path for role's answers
+        role_answers_path = os.path.join(answers_base_dir, role_dir) 
 
         if not os.path.isdir(role_questions_path):
             continue
@@ -116,9 +109,8 @@ def main():
             if filename.startswith("q_") and filename.endswith(".json"):
                 question_file_path = os.path.join(role_questions_path, filename)
                 try:
-                    with open(question_file_path, 'r', encoding='utf-8') as f: # Added encoding
+                    with open(question_file_path, 'r', encoding='utf-8') as f: 
                         question_data = json.load(f)
-                    # Ensure question_data has necessary fields before creating Question object
                     if not all(k in question_data for k in ["id", "role", "type", "difficulty", "content", "expected_skills"]):
                          logger.error(f"Skipping invalid question file {question_file_path}: Missing required fields.")
                          continue
@@ -143,23 +135,8 @@ def main():
                                 with open(answer_filepath, 'w', encoding='utf-8') as af: # Added encoding
                                     json.dump(answer_data, af, indent=2)
 
-                                # Generate and save feedback (optional, but good practice)
-                                # metrics = metrics_generator.evaluate_answer(
-                                #     question.content,
-                                #     answer.content,
-                                #     question.expected_skills
-                                # )
-                                # feedback = data_generator.generate_feedback(answer, metrics)
-                                # feedback_filename = f"f_{answer_id}.json"
-                                # feedback_filepath = os.path.join(question_answer_dir, feedback_filename)
-                                # feedback_data = {**asdict(feedback), "created_at": feedback.created_at.isoformat()}
-                                # with open(feedback_filepath, 'w', encoding='utf-8') as ff: # Added encoding
-                                #     json.dump(feedback_data, ff, indent=2)
-
                             except Exception as e_gen:
                                 logger.error(f"Error generating/saving answer/feedback for {question.id} ({quality}): {str(e_gen)}")
-                        # else: # Optional: Log if answer already exists
-                        #     logger.debug(f"Answer file already exists, skipping: {answer_filepath}")
 
 
                 except FileNotFoundError:

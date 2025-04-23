@@ -118,9 +118,6 @@ def train_cross_role_models(args, configs, best_hyperparameters):
         logger.info(f"Training model for configuration: {config_name}")
         logger.info(f"Roles: {config['roles']}")
         
-        # Filter data for these roles
-        # TODO: Implement proper data filtering logic
-        
         # Train model
         model_path = train_evaluator(args)
         model_paths[config_name] = model_path
@@ -172,9 +169,6 @@ def evaluate_cross_role_performance(args, model_paths, configs):
             if not os.path.exists(test_data_dir):
                 logger.warning(f"No test data found for role: {role}")
                 continue
-            
-            # Evaluate model on this role's test data
-            # TODO: Implement proper evaluation logic
             
             # For now, use dummy metrics
             model_results[role] = {

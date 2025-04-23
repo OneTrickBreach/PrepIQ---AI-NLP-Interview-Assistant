@@ -11,7 +11,7 @@ import numpy as np
 from transformers import AutoModel, AutoTokenizer
 from src.models.base import BaseModel
 from src.schemas import Question, Answer, EvaluationMetrics, Feedback
-from datetime import datetime # Added for generate_answer/feedback placeholders
+from datetime import datetime 
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +27,6 @@ class FeatureExtractor(nn.Module):
 
     def forward(self, input_ids, attention_mask):
         outputs = self.encoder(input_ids=input_ids, attention_mask=attention_mask)
-        # Use the [CLS] token embedding as the sentence representation
         cls_embedding = outputs.last_hidden_state[:, 0, :]
         return cls_embedding
 
@@ -42,7 +41,7 @@ class MetricPredictor(nn.Module):
         self.activation = nn.ReLU()
         self.dropout = nn.Dropout(0.1)
         self.dense2 = nn.Linear(hidden_dim, 1)
-        self.sigmoid = nn.Sigmoid() # Output score between 0 and 1
+        self.sigmoid = nn.Sigmoid() 
 
     def forward(self, x):
         x = self.layer_norm(x)
@@ -51,7 +50,7 @@ class MetricPredictor(nn.Module):
         x = self.dropout(x)
         x = self.dense2(x)
         x = self.sigmoid(x)
-        return x.squeeze(-1) # Remove last dimension
+        return x.squeeze(-1) 
 
 class CustomEvaluator(nn.Module):
     """
@@ -66,13 +65,10 @@ class CustomEvaluator(nn.Module):
         super().__init__()
         self.feature_extractor = FeatureExtractor(pretrained_model_name)
         
-        # Get the output dimension of the feature extractor
-        # Temporarily load config to get hidden size
         from transformers import AutoConfig
         config = AutoConfig.from_pretrained(pretrained_model_name)
         encoder_output_dim = config.hidden_size
 
-        # Create separate prediction heads for each metric
         self.technical_accuracy_head = MetricPredictor(encoder_output_dim, hidden_dim)
         self.completeness_head = MetricPredictor(encoder_output_dim, hidden_dim)
         self.clarity_head = MetricPredictor(encoder_output_dim, hidden_dim)
@@ -91,7 +87,6 @@ class CustomEvaluator(nn.Module):
         """
         features = self.feature_extractor(input_ids, attention_mask)
         
-        # Predict each metric
         technical_accuracy = self.technical_accuracy_head(features)
         completeness = self.completeness_head(features)
         clarity = self.clarity_head(features)
@@ -163,22 +158,21 @@ class CustomEvaluatorModel(BaseModel):
                 logger.info("Trained weights loaded successfully.")
             except Exception as e:
                  logger.error(f"Failed to load weights from {self.model_path}: {e}. Using base model weights only.")
-                 # Continue without loaded weights if loading fails
+                 
         else:
-            if self.model_path: # Log if path was given but not found
+            if self.model_path: 
                  logger.warning(f"Model path specified but not found: {self.model_path}. Using base model weights only.")
-            else: # Log if no path was given and none found automatically
+            else: 
                  logger.info("No trained model path specified or found. Using base model weights only.")
             
         self.model.to(self.device)
-        self.model.eval() # Set model to evaluation mode
+        self.model.eval() 
 
     def _load_role_criteria(self) -> Dict[str, Dict[str, List[str]]]:
         """
         Load role-specific criteria for evaluation.
         (Placeholder implementation)
         """
-        # This would typically load from a JSON file or database
         return {
             "Software Engineer": {
                 "technical_keywords": ["algorithm", "data structure", "complexity", "efficiency", "testing", "debugging"],
@@ -188,14 +182,13 @@ class CustomEvaluatorModel(BaseModel):
                 "technical_keywords": ["machine learning", "statistics", "data", "model", "algorithm", "prediction"],
                 "expected_concepts": ["feature engineering", "model evaluation", "statistical significance", "bias-variance tradeoff"]
             },
-            # Add more roles as needed
+            
         }
         
     def _prepare_input(self, question: Question, answer: Answer) -> str:
         """
         Prepare input text for the model by combining question and answer details.
         """
-        # Use placeholder values if attributes are missing (e.g., from dummy objects)
         q_content = getattr(question, 'content', 'Unknown Question')
         q_role = getattr(question, 'role', 'unknown')
         q_difficulty = getattr(question, 'difficulty', 'unknown')
@@ -208,7 +201,6 @@ class CustomEvaluatorModel(BaseModel):
         """
         if not self.model or not self.tokenizer:
              logger.error("Model or tokenizer not loaded properly for evaluation.")
-             # Return default low scores or raise an error
              return EvaluationMetrics(technical_accuracy=0.0, completeness=0.0, clarity=0.0, relevance=0.0, overall_score=0.0)
 
         # Prepare input
@@ -219,7 +211,7 @@ class CustomEvaluatorModel(BaseModel):
             inputs = self.tokenizer(input_text, 
                                    return_tensors="pt", 
                                    truncation=True, 
-                                   max_length=512, # Consider making max_length configurable
+                                   max_length=512, 
                                    padding="max_length")
         except Exception as e:
              logger.error(f"Tokenization failed: {e}")
@@ -228,7 +220,6 @@ class CustomEvaluatorModel(BaseModel):
         # Move inputs to the correct device
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         
-        # Get predictions
         try:
             with torch.no_grad():
                 outputs = self.model(**inputs)
@@ -262,7 +253,6 @@ class CustomEvaluatorModel(BaseModel):
 
         except Exception as e:
              logger.exception(f"Error during model inference or metric calculation: {e}")
-             # Return default low scores on error
              return EvaluationMetrics(technical_accuracy=0.0, completeness=0.0, clarity=0.0, relevance=0.0, overall_score=0.0)
 
         
@@ -273,14 +263,13 @@ class CustomEvaluatorModel(BaseModel):
         logger.warning("generate_answer called on CustomEvaluatorModel, which is not designed for generation.")
         answer_text = "This model focuses on evaluation, not answer generation."
         
-        # Use getattr for safety with potentially incomplete Question objects
         q_id = getattr(question, 'id', 'unknown_question')
 
         return Answer(
             id=f"a_{q_id}",
             question_id=q_id,
             content=answer_text,
-            confidence=0.1, # Low confidence as it's a placeholder
+            confidence=0.1, 
             created_at=datetime.utcnow()
         )
         
@@ -295,7 +284,6 @@ class CustomEvaluatorModel(BaseModel):
         # Generate feedback based on metrics
         feedback_text = self._generate_feedback_text(question, answer, metrics)
         
-        # Use getattr for safety with potentially incomplete Answer objects
         ans_id = getattr(answer, 'id', 'unknown_answer')
 
         return Feedback(

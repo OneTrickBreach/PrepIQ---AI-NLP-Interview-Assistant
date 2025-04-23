@@ -68,7 +68,6 @@ def objective(trial, args):
     model.eval()
     
     # Return validation loss (saved during training)
-    # This is a bit of a hack - in a production system you would store metrics more systematically
     metrics_path = best_model_path.replace(".pt", "_metrics.json")
     with open(metrics_path, 'r') as f:
         metrics = json.load(f)
@@ -144,9 +143,6 @@ def train_role_specific_models(args, best_hyperparameters):
         role_data_dir = os.path.join(args.output_dir, "role_specific", role)
         os.makedirs(role_data_dir, exist_ok=True)
         
-        # Filter data for this role
-        # TODO: Implement role-specific data filtering logic
-        
         # Train model
         model_path = train_evaluator(args)
         role_models[role] = model_path
@@ -198,12 +194,6 @@ def evaluate_models(args, best_hyperparameters):
         model.eval()
         
         role_models[role] = model
-    
-    # Load test data
-    # TODO: Implement test data loading logic
-    
-    # Evaluate models
-    # TODO: Implement model evaluation logic
     
     # Save evaluation results
     eval_results = {

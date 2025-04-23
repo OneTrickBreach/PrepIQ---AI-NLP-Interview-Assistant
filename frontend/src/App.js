@@ -3,14 +3,12 @@ import { Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 
-// Import components and pages
 import Header from './components/Header';
 import HomePage from './pages/HomePage';
 import InterviewPage from './pages/InterviewPage';
 import ResultsPage from './pages/ResultsPage';
 import NotFoundPage from './pages/NotFoundPage';
 
-// Create a theme
 const theme = createTheme({
   palette: {
     primary: {
