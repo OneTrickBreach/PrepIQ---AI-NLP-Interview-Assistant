@@ -178,7 +178,7 @@ You need to run the backend and frontend servers simultaneously in separate term
   - Start the React development server:
 
     ```bash
-    npm start
+    npm start dev
     ```
 
 - Once both servers are running, the application should be available in your web browser at `http://localhost:3000`.
