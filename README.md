@@ -28,39 +28,61 @@ An AI-powered platform to generate interview questions, evaluate candidate answe
 
 ```
 .
-├── src/                    # Backend Python code (FastAPI server, models, feedback)
-│   ├── main.py             # FastAPI app entry point
-│   ├── speech_to_text.py   # OpenAI Whisper integration
-│   ├── data_generation.py  # Synthetic data generation
-│   ├── models/             # Custom model definitions
-│   ├── feedback/           # Feedback generation logic
-│   ├── integration/        # Integration pipelines
-│   ├── schemas/            # Pydantic schemas
-│   ├── training/           # Training utilities
-│   └── api/                # API submodules
-│
-├── scripts/                # Python scripts for data prep, training, evaluation
-│   ├── train_custom_evaluator.py  # Train/fine-tune the custom evaluation model
-│   ├── generate_dataset.py        # Generate synthetic dataset
-│   ├── organize_data.py           # Organize data into training format
-│   ├── evaluate_models.py         # Evaluate trained models
-│   └── ...                        # Other utilities
-│
-├── frontend/               # React frontend app
-│   ├── package.json
-│   ├── src/
-│   │   ├── App.js
-│   │   ├── api/            # API client code
-│   │   ├── components/     # UI components
-│   │   └── pages/          # App pages (Interview, Results, etc.)
-│   └── public/
-│
-├── organized_data/         # Processed data for training
-├── models/                 # Saved model checkpoints
-├── requirements.txt        # Python dependencies
-├── .gitignore              # Git ignore rules
-├── README.md               # This file
-
+├── .gitignore                                               #  Git ignore rules
+├── demo.py                                                  #  Script to quickly start backend and frontend
+├── error_log.txt                                            #  Log file for errors
+├── README.md                                                #  This file
+├── requirements.txt                                         #  Python dependencies
+├── test_workflow.py                                         #  Workflow for testing
+├── test.ipynb                                               #  Jupyter notebook for testing
+├── config/                                                  #  Configuration files
+│   └── config.py                                            #  Main configuration file
+├── docs/                                                    #  Documentation files
+│   └── DATA_GENERATION.md                                   #  Documentation for data generation
+├── frontend/                                                #  React frontend application
+│   ├── package-lock.json                                    #  Dependency lock file for npm
+│   ├── package.json                                         #  Frontend dependencies and scripts
+│   └── src/                                                 #  Frontend source code
+├── organized_data/                                          #  Processed data for training
+│   ├── placeholder.txt                                      #  Placeholder file
+│   ├── answers/                                             #  Organized answer data
+│   ├── questions/                                           #  Organized question data
+│   └── roles/                                               #  Organized role data
+├── results/                                                 #  Results from evaluations and tests
+│   ├── custom_evaluator_input.json                          #  Input for custom evaluator
+│   ├── custom_evaluator_output.json                         #  Output from custom evaluator
+│   ├── custom_evaluator_test_results.json                   #  Test results for custom evaluator
+│   └── placeholder.txt                                      #  Placeholder file
+├── scripts/                                              #  Python scripts for data prep, training, evaluation
+│   ├── create_test_set.py                                   #  Script to create a test set
+│   ├── cross_role_training.py                               #  Script for cross-role training
+│   ├── evaluate_models.py                                   #  Script to evaluate models
+│   ├── generate_dataset.py                                  #  Script to generate synthetic dataset
+│   ├── generate_metrics.py                                  #  Script to generate metrics
+│   ├── generate_missing_answers.py                          #  Script to generate missing answers
+│   ├── hyperparameter_tuning.py                             #  Script for hyperparameter tuning
+│   ├── organize_data.py                                     #  Script to organize data
+│   ├── start_server.py                                      #  Script to start the server
+│   ├── test_custom_evaluator.py                             #  Script to test custom evaluator
+│   ├── test_integration.py                                  #  Script for integration tests
+│   ├── train_custom_evaluator.py                            #  Script to train custom evaluator
+│   └── train_model.py                                       #  Script to train models
+├── src/                                                     #  Backend Python code
+│   ├── __init__.py                                          #  Initializes the src directory as a Python package
+│   ├── data_generation.py                                   #  Synthetic data generation
+│   ├── main.py                                              #  FastAPI app entry point
+│   ├── metrics.py                                           #  Metrics calculation
+│   ├── schemas.py                                           #  Pydantic schemas
+│   └── speech_to_text.py                                    #  OpenAI Whisper integration
+├── test_data/                                               #  Test data
+│   ├── placeholder.txt                                      #  Placeholder file
+│   ├── answers/                                             #  Test answer data
+│   ├── questions/                                           #  Test question data
+│   └── roles/                                               #  Test role data
+└── tests/                                                   #  Unit and integration tests
+    ├── test_metrics.py                                      #  Tests for metrics
+    ├── test_models.py                                       #  Tests for models
+    └── test_speech_to_text.py                               #  Tests for speech-to-text
 ```
 
 ## Setup Instructions
