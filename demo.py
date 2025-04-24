@@ -28,7 +28,7 @@ def run_backend_and_wait():
 def run_frontend():
     print("[INFO] Starting frontend...")
     frontend_path = os.path.join(os.getcwd(), "frontend")
-    subprocess.Popen(["npm", "start"], cwd=frontend_path, shell=True)
+    subprocess.Popen(["npm", "start", "dev"], cwd=frontend_path, shell=True)
 
 if __name__ == "__main__":
     try:
